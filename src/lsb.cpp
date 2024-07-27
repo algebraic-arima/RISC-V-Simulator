@@ -11,8 +11,8 @@ namespace arima {
     }
 
     void LoadStoreBuffer::execute() {
-      if (cd_bus->get_type() == BusType::Reg) {
-        auto e = cd_bus->read();
+      if (mem_bus->get_type() == BusType::Reg) {
+        auto e = mem_bus->read();
         int reg = e.first;
         word val = e.second;
         for (auto &entry: lsb) {

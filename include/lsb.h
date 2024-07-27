@@ -19,7 +19,7 @@ namespace arima {
 
     class LoadStoreBuffer {
       cir_queue<LsbEntry, LSB_SIZE> lsb;
-      Bus *cd_bus;
+      Bus *mem_bus;
     private:
       cir_queue<LsbEntry, LSB_SIZE> new_lsb;
       MemoryController mem;

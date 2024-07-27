@@ -26,13 +26,16 @@ namespace arima {
     };
 
     class ReorderBuffer {
-      cir_queue<RobEntry, ROB_SIZE> rob;
+      cir_queue<RobEntry, ROB_SIZE> new_rob;
+      Bus *cd_bus;
     public:
-      ReorderBuffer() = default;
+      cir_queue<RobEntry, ROB_SIZE> rob;
+
+      void add(const RobEntry &entry);
 
       void issue(const Instruction &, RegFile &, int);
 
-      void write(const RobEntry &, bus *);
+      void write(const RobEntry &);
 
       void update();
 
@@ -47,6 +50,10 @@ namespace arima {
       int get_value(int i) { return rob[i].value; }
 
       RobState get_state(int i) { return rob[i].status; }
+
+      void flush();
+
+      void execute();
 
     };
 }

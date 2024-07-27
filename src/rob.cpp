@@ -5,6 +5,10 @@
 #include "lsb.h"
 
 namespace arima {
+    void ReorderBuffer::add(const RobEntry &entry) {
+      new_rob.push(entry);
+    }
+
     void ReorderBuffer::issue(const Instruction &ins, RegFile &reg, int value) {
       RobEntry entry;
       entry.status = Issue;
@@ -25,5 +29,17 @@ namespace arima {
       }
       RobEntry entry = rob.pop();
 
+    }
+
+    void ReorderBuffer::execute() {
+      if (cd_bus->get_type() == BusType::Reg) {
+        auto e = cd_bus->read();
+        for (auto &entry: rob) {
+          if (entry.dest == e.first) {
+            entry.status = Exec;
+            entry.value = e.value;
+          }
+        }
+      }
     }
 }
