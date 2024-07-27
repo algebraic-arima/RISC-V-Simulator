@@ -6,7 +6,7 @@
 
 namespace arima{
 
-    struct lsEntry{
+    struct LsbEntry{
       opCode code{}; // LB, LH, LW, LBU, LHU, SB, SH, SW
       int vj = 0, vk = 0;
       int qj = -1, qk = -1;
@@ -15,9 +15,9 @@ namespace arima{
     };
 
     class LoadStoreBuffer{
-      cir_queue<lsEntry, LSB_SIZE> lsb;
+      cir_queue<LsbEntry, LSB_SIZE> lsb;
     private:
-      cir_queue<lsEntry, LSB_SIZE> new_lsb;
+      cir_queue<LsbEntry, LSB_SIZE> new_lsb;
 
       void flush();
 

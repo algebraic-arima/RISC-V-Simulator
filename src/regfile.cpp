@@ -15,4 +15,8 @@ namespace arima {
     void RegFile::set_dep(std::size_t idx, int dep) {
         reg[idx].dep = dep;
     }
+
+    int RegFile::get_dep(std::size_t idx) {
+        return reg[idx].dep;
+    }
 }

@@ -79,7 +79,7 @@ namespace arima {
     struct Instruction {
       opType type;
       opCode code;
-      word imm;
+      int imm;
       word rd, rs1, rs2;
     };
 

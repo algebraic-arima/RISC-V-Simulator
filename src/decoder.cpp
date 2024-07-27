@@ -259,19 +259,29 @@ namespace arima {
       if (rss.full() || rob.full() || lsb.full()) {
         return;
       }
-      RssEntry e;
-      RobEntry r;
-      e.ins = ins;
-      r.ins = ins;
-      r.status = robState::Issue;
-      if (ins.type == opType::U) {
-        if (ins.code == opCode::AUIPC) {
-          e.vj = instrAddr;
-          e.vk = ins.imm;
-          e.rob_dest = rob.get_empty();
+      if (ins.code == opCode::AUIPC) {
+        new_rob = {RobState::Issue, ins, ins.rd, static_cast<int>((instrAddr + ins.imm))};
+      } else if (ins.code == opCode::LUI) {
+        new_rob = {RobState::Issue, ins, ins.rd, ins.imm};
+      } else if (ins.type == R) {
+        new_rob = {RobState::Issue, ins, ins.rd, 0};
+        new_rss = {ins, 0, 0, -1, -1, 0, rob.get_empty()};
+        if (int r_i = reg.get_dep(ins.rs1) != -1) {
+          new_rss.qj = r_i;
+        } else {
+          new_rss.vj = reg[ins.rs1];
         }
+        if (int r_i = reg.get_dep(ins.rs2) != -1) {
+          new_rss.qk = r_i;
+        } else {
+          new_rss.vk = reg[ins.rs2];
+        }
+      } else if(ins.type==S){
+
       }
+
     }
+
 
 }
 

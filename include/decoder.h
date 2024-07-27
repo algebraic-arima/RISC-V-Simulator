@@ -26,6 +26,11 @@ namespace arima {
     };
 
     class Decoder {
+      RssEntry new_rss;
+      RobEntry new_rob;
+      LsbEntry new_lsb;
+
+    public:
       word instrAddr = 0;
       Predictor pred;
 

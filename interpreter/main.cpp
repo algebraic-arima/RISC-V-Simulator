@@ -88,7 +88,7 @@ public:
 struct Instruction {
   opType type{};
   opCode code{};
-  word imm = -1;
+  int imm = -1;
   word rd = -1, rs1 = -1, rs2 = -1;
 };
 

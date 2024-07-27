@@ -8,7 +8,7 @@
 
 namespace arima {
 
-    enum robState {
+    enum RobState {
       Issue,
       Exec, // for arithmetic
       Exec1,
@@ -19,8 +19,7 @@ namespace arima {
     };
 
     struct RobEntry {
-      bool busy = false;
-      robState status{};
+      RobState status{};
       Instruction ins{};
       word dest = -1;
       int value = 0;
