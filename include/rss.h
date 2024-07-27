@@ -7,21 +7,31 @@
 
 namespace arima {
     struct RssEntry {
+      bool busy = false;
       Instruction ins{};
       int vj = 0, vk = 0;
       int qj = -1, qk = -1;
-      word a = 0;
+      int a = 0;
       int rob_dest = -1;
     };
 
     class ReservationStation {
     public:
-      cir_queue<RssEntry, RS_SIZE> rss;
+      RssEntry rss[RS_SIZE];
     private:
-      cir_queue<RssEntry, RS_SIZE> next_rss;
+      RssEntry next_rss[RS_SIZE];
     public:
-      bool empty() { return rss.empty(); }
-      bool full() { return rss.full(); }
+      int find_empty() {
+        for (int i = 0; i < RS_SIZE; i++)
+          if (!rss[i].busy) return i;
+        return -1;
+      }
+
+      bool full(){
+        for (int i = 0; i < RS_SIZE; i++)
+          if (!rss[i].busy) return false;
+        return true;
+      }
     };
 }
 

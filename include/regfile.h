@@ -7,12 +7,14 @@ namespace arima {
 
     struct Register {
       word val = 0;
-      int dep = 0;
+      int dep = 0; // -1 for no dependency
     };
 
     class RegFile {
-      Register reg[REG_SIZE];
+      Register new_reg[REG_SIZE];
     public:
+      Register reg[REG_SIZE];
+
       RegFile();
 
       word &operator[](std::size_t);
@@ -20,6 +22,10 @@ namespace arima {
       void set_dep(std::size_t, int);
 
       int get_dep(std::size_t);
+
+      void flush();
+
+      void execute(){}
     };
 }
 

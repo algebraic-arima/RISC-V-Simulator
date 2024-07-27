@@ -2,21 +2,31 @@
 #define RISCV_BUS_H
 
 #include "param.h"
+#include <iostream>
 
-namespace arima{
+namespace arima {
 
     enum class BusType {
-        INST,
-        DATA
+      Reg,
+      Mem,
+      PC,
     };
 
 
     class Bus {
       BusType type;
+      int reg;
       word val;
     public:
-        static void write(word addr, word data);
-        static word read(word addr);
+      BusType get_type() const { return type; }
+
+      void write(BusType t, int re, word va) {
+        type = t;
+        reg = re;
+        val = va;
+      }
+
+      std::pair<int, word> read() { return {reg, val}; }
     };
 }
 

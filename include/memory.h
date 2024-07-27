@@ -2,6 +2,7 @@
 #define RISCV_MEM_HPP
 
 #include "param.h"
+#include "utils.h"
 
 namespace arima {
     class Memory {
@@ -26,16 +27,24 @@ namespace arima {
         return ram[addr];
       }
 
-      byte ldb(word addr) {
-        return ram[addr];
+      word ldb(word addr) {
+        return signExt(ram[addr], 8);
       }
 
-      hword ldh(word addr) {
-        return ram[addr] | (ram[addr + 1] << 8);
+      word ldh(word addr) {
+        return signExt(ram[addr] | (ram[addr + 1] << 8), 16);
       }
 
       word ldw(word addr) {
         return ram[addr] | (ram[addr + 1] << 8) | (ram[addr + 2] << 16) | (ram[addr + 3] << 24);
+      }
+
+      word ldbu(word addr) {
+        return ram[addr];
+      }
+
+      word ldhu(word addr) {
+        return ram[addr] | (ram[addr + 1] << 8);
       }
 
       void stb(word addr, byte data) {

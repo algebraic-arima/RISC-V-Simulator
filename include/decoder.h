@@ -26,19 +26,35 @@ namespace arima {
     };
 
     class Decoder {
+      bool push_rss = false, push_rob = false, push_lsb = false;
       RssEntry new_rss;
       RobEntry new_rob;
       LsbEntry new_lsb;
 
     public:
       word instrAddr = 0;
+      word new_instrAddr = 0;
+      bool freeze = false;
+      bool new_freeze = false;
       Predictor pred;
 
       void decode(word, Instruction &);
 
-      word fetch(MemoryController *mem);
+      word fetch(MemoryController &mem);
 
-      void parse(const Instruction &ins, RegFile &reg, ReorderBuffer &rob, LoadStoreBuffer &lsb,ReservationStation &rss);
+      void parse(const Instruction &ins,
+                 RegFile &reg,
+                 ReorderBuffer &rob,
+                 LoadStoreBuffer &lsb,
+                 ReservationStation &rss);
+
+      void execute(RegFile &reg,
+                   ReorderBuffer &rob,
+                   LoadStoreBuffer &lsb,
+                   ReservationStation &rss,
+                   MemoryController &mem);
+
+      void flush();
     };
 
 }

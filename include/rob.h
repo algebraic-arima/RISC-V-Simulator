@@ -43,6 +43,11 @@ namespace arima {
       bool full() { return rob.full(); }
 
       int get_empty() { return rob.full() ? -1 : rob.tail; }
+
+      int get_value(int i) { return rob[i].value; }
+
+      RobState get_state(int i) { return rob[i].status; }
+
     };
 }
 

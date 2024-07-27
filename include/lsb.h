@@ -3,32 +3,38 @@
 
 #include "param.h"
 #include "utils.h"
+#include "memory.h"
+#include "bus.h"
 
-namespace arima{
+namespace arima {
 
-    struct LsbEntry{
+    struct LsbEntry {
+      bool ready = false;
       opCode code{}; // LB, LH, LW, LBU, LHU, SB, SH, SW
       int vj = 0, vk = 0;
       int qj = -1, qk = -1;
-      word a = 0; // a temporary address after vj and vk are available
+      int a = 0; // a temporary address after vj and vk are available
       int rob_dest = -1;
     };
 
-    class LoadStoreBuffer{
+    class LoadStoreBuffer {
       cir_queue<LsbEntry, LSB_SIZE> lsb;
+      Bus *cd_bus;
     private:
       cir_queue<LsbEntry, LSB_SIZE> new_lsb;
-
-      void flush();
-
-      void execute();
+      MemoryController mem;
 
     public:
 
       bool empty() { return lsb.empty(); }
+
       bool full() { return lsb.full(); }
 
-      void step();
+      void add(const LsbEntry &entry);
+
+      void flush();
+
+      void execute();
 
     };
 }

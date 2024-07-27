@@ -2,21 +2,29 @@
 
 namespace arima {
     RegFile::RegFile() {
-        for (int i = 0; i < REG_SIZE; i++) {
-            reg[i].val = 0;
-            reg[i].dep = 0;
-        }
+      for (int i = 0; i < REG_SIZE; i++) {
+        reg[i].val = 0;
+        reg[i].dep = -1;
+      }
     }
 
     word &RegFile::operator[](std::size_t idx) {
-        return reg[idx].val;
+      return reg[idx].val;
     }
 
     void RegFile::set_dep(std::size_t idx, int dep) {
-        reg[idx].dep = dep;
+      new_reg[idx].dep = dep;
     }
 
     int RegFile::get_dep(std::size_t idx) {
-        return reg[idx].dep;
+      return reg[idx].dep;
+    }
+
+    void RegFile::flush() {
+      for (int i = 1; i < REG_SIZE; i++) {
+        reg[i] = new_reg[i];
+      }
+      reg[0].val = 0;
+      reg[0].dep = -1;
     }
 }

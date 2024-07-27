@@ -6,8 +6,7 @@
 
 namespace arima {
     void ReorderBuffer::issue(const Instruction &ins, RegFile &reg, int value) {
-      robEntry entry;
-      entry.busy = true;
+      RobEntry entry;
       entry.status = Issue;
       entry.ins = ins;
       entry.dest = ins.rd;
@@ -24,7 +23,7 @@ namespace arima {
       if (rob.front().status != Write) {
         return;
       }
-      robEntry entry = rob.pop();
+      RobEntry entry = rob.pop();
 
     }
 }

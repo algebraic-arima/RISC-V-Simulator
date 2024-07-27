@@ -58,7 +58,44 @@ namespace arima {
       bool full() {
         return (tail + 1) % size == head;
       }
+
+      struct iterator {
+        int index;
+        T *data;
+
+        iterator(int index, T *data) : index(index), data(data) {}
+
+        T &operator*() {
+          return data[index];
+        }
+
+        iterator &operator++() {
+          index = (index + 1) % size;
+          return *this;
+        }
+
+        bool operator!=(const iterator &other) {
+          return index != other.index;
+        }
+
+        bool operator==(const iterator &other) {
+          return index == other.index;
+        }
+
+
+      };
+
+      iterator begin() {
+        return iterator(head, data);
+      }
+
+      iterator end() {
+        return iterator(tail, data);
+      }
+
     };
+
+
 }
 
 #endif //RISCV_UTILS_H
