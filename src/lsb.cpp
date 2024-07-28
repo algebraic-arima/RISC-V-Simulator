@@ -6,6 +6,14 @@ namespace arima {
       new_lsb.push(entry);
     }
 
+    void LoadStoreBuffer::set_ready(int rob_dest) {
+      for (auto &entry: new_lsb) {
+        if (entry.rob_dest == rob_dest) {
+          entry.ready = true;
+        }
+      }
+    }
+
     void LoadStoreBuffer::flush() {
       lsb = new_lsb;
     }
@@ -32,30 +40,43 @@ namespace arima {
       if (!entry.ready || entry.qj != -1 || entry.qk != -1) {
         return;
       } else {
+        entry.a += entry.vj;
         switch (entry.code) {
           case LB:
             result = mem.ldb(entry.a);
+            new_mem_bus->write(BusType::Reg, entry.rob_dest, result);
             break;
           case LH:
             result = mem.ldh(entry.a);
+            new_mem_bus->write(BusType::Reg, entry.rob_dest, result);
             break;
           case LW:
             result = mem.ldw(entry.a);
+            new_mem_bus->write(BusType::Reg, entry.rob_dest, result);
             break;
           case LBU:
             result = mem.ldbu(entry.a);
+            new_mem_bus->write(BusType::Reg, entry.rob_dest, result);
             break;
           case LHU:
             result = mem.ldhu(entry.a);
+            new_mem_bus->write(BusType::Reg, entry.rob_dest, result);
             break;
           case SB:
-            mem.stb(entry.a, entry.vj);
+            mem.stb(entry.a, entry.vk);
+            new_mem_bus->write(BusType::Mem, entry.rob_dest, 1);
+            // when store is prepared, write a success to mem_bus
+            // then rob will know the store is ready and set WRITE
+            // when ST comes to the head, it will be committed and
+            // simultaneously write to memory
             break;
           case SH:
-            mem.sth(entry.a, entry.vj);
+            mem.sth(entry.a, entry.vk);
+            new_mem_bus->write(BusType::Mem, entry.rob_dest, 1);
             break;
           case SW:
-            mem.stw(entry.a, entry.vj);
+            mem.stw(entry.a, entry.vk);
+            new_mem_bus->write(BusType::Mem, entry.rob_dest, 1);
             break;
           default:
             break;

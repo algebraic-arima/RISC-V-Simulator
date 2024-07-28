@@ -4,7 +4,6 @@
 #include "decoder.h"
 #include "utils.h"
 
-
 namespace arima {
     struct RssEntry {
       bool busy = false;

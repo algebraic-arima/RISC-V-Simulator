@@ -13,13 +13,14 @@ namespace arima {
       opCode code{}; // LB, LH, LW, LBU, LHU, SB, SH, SW
       int vj = 0, vk = 0;
       int qj = -1, qk = -1;
-      int a = 0; // a temporary address after vj and vk are available
+      int a = 0; // a temporary address after vj and vk are available or an imm
       int rob_dest = -1;
     };
 
     class LoadStoreBuffer {
       cir_queue<LsbEntry, LSB_SIZE> lsb;
       Bus *mem_bus;
+      Bus *new_mem_bus;
     private:
       cir_queue<LsbEntry, LSB_SIZE> new_lsb;
       MemoryController mem;
@@ -31,6 +32,8 @@ namespace arima {
       bool full() { return lsb.full(); }
 
       void add(const LsbEntry &entry);
+
+      void set_ready(int rob_dest);
 
       void flush();
 

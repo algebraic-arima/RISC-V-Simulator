@@ -55,6 +55,8 @@ namespace arima {
                    MemoryController &mem);
 
       void flush();
+
+      void melt();
     };
 
 }

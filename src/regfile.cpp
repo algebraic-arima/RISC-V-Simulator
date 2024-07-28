@@ -12,6 +12,10 @@ namespace arima {
       return reg[idx].val;
     }
 
+    word RegFile::operator[](std::size_t idx) const {
+      return reg[idx].val;
+    }
+
     void RegFile::set_dep(std::size_t idx, int dep) {
       new_reg[idx].dep = dep;
     }

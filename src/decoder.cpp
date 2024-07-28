@@ -343,6 +343,7 @@ namespace arima {
           new_rss.vk = reg[ins.rs2];
         }
         new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
+        new_rob.value = pred.predict();// 1 for jump, 0 for not
       }
     }
 
@@ -356,6 +357,8 @@ namespace arima {
                           LoadStoreBuffer &lsb,
                           ReservationStation &rss,
                           MemoryController &mem) {
+      push_rss = false, push_lsb = false, push_rob = false;
+      //bug: decoder has to query the mem_bus and cd_bus
       if (freeze) {
         return;
       }
@@ -363,15 +366,19 @@ namespace arima {
       word instr = fetch(mem);
       decode(instr, ins);
       parse(ins, reg, rob, lsb, rss);
-      if (push_rob) {
+      if (push_rob && push_rss) {
+        reg.set_dep(new_rob.dest, rob.get_empty()); // set dependence
         rob.add(new_rob);
-      }
-      if (push_rss) {
         rss.add(new_rss);
       }
       if (push_lsb) {
         lsb.add(new_lsb);
       }
+
+    }
+
+    void Decoder::melt() {
+      freeze = false;
     }
 
 

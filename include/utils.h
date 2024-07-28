@@ -33,6 +33,14 @@ namespace arima {
         return data[head];
       }
 
+      int get_front() const{
+        return head;
+      }
+
+      int get_tail() const{
+        return tail;
+      }
+
       T &back() {
         return data[(tail - 1 + size) % size];
       }
@@ -55,7 +63,7 @@ namespace arima {
         return head == tail;
       }
 
-      bool full() {
+      bool full() const {
         return (tail + 1) % size == head;
       }
 

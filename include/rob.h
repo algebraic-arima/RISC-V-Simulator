@@ -5,15 +5,12 @@
 #include "utils.h"
 #include "regfile.h"
 #include "lsb.h"
+#include "decoder.h"
 
 namespace arima {
 
     enum RobState {
       Issue,
-      Exec, // for arithmetic
-      Exec1,
-      Exec2,
-      Exec3, // for load and store
       Write,
       Commit
     };
@@ -27,7 +24,8 @@ namespace arima {
 
     class ReorderBuffer {
       cir_queue<RobEntry, ROB_SIZE> new_rob;
-      Bus *cd_bus;
+      Bus *cd_bus,*mem_bus;
+      Bus *new_cd_bus,*new_mem_bus;
     public:
       cir_queue<RobEntry, ROB_SIZE> rob;
 
@@ -43,9 +41,11 @@ namespace arima {
 
       bool empty() { return rob.empty(); }
 
-      bool full() { return rob.full(); }
+      bool full() const { return rob.full(); }
 
-      int get_empty() { return rob.full() ? -1 : rob.tail; }
+      int get_empty() const { return rob.full() ? -1 : rob.tail; }
+
+      int get_front() const{ return rob.head; }
 
       int get_value(int i) { return rob[i].value; }
 
@@ -53,7 +53,7 @@ namespace arima {
 
       void flush();
 
-      void execute();
+      void execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb, MemoryController &mem);
 
     };
 }
