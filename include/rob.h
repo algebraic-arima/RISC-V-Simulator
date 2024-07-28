@@ -33,11 +33,9 @@ namespace arima {
 
       void issue(const Instruction &, RegFile &, int);
 
-      void write(const RobEntry &);
+      void update(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
 
-      void update();
-
-      void commit(RegFile &reg, LoadStoreBuffer &lsb);
+      void commit(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
 
       bool empty() { return rob.empty(); }
 
@@ -53,7 +51,7 @@ namespace arima {
 
       void flush();
 
-      void execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb, MemoryController &mem);
+      void execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
 
     };
 }

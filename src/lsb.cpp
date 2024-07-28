@@ -33,7 +33,9 @@ namespace arima {
             entry.qk = -1;
           }
         }
-      } // read from cdb to fetch dependency
+      }
+      // todo: read from cdb to fetch dependency
+
       if (new_lsb.empty()) return;
       LsbEntry entry = new_lsb.front();
       word result;
@@ -82,7 +84,6 @@ namespace arima {
             break;
         }
         new_lsb.pop();
-        lsb.push(entry);
       }
 
     }

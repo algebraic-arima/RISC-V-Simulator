@@ -10,32 +10,11 @@ namespace arima {
       new_rob.push(entry);
     }
 
-    void ReorderBuffer::issue(const Instruction &ins, RegFile &reg, int value) {
-      RobEntry entry;
-      entry.status = Issue;
-      entry.ins = ins;
-      entry.dest = ins.rd;
-      reg.set_dep(ins.rd, rob.tail);
-      entry.value = value;
-      rob.push(entry);
+    void ReorderBuffer::flush() {
+      rob = new_rob;
     }
 
-    void ReorderBuffer::commit(RegFile &reg, LoadStoreBuffer &lsb) {
-      if (rob.empty()) return;
-      while (rob.front().status == Commit) {
-        rob.pop();
-      }
-      if (rob.front().status != Write) {
-        return;
-      }
-      RobEntry entry = rob.pop();
-
-    }
-
-    // issue--(dep removed)->exec
-    // --(result broadcast)->write
-    // --(ST ? stored successfully  :head)->commit
-    void ReorderBuffer::execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb, MemoryController &mem) {
+    void ReorderBuffer::update(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb) {
       if (new_rob.empty()) return;
       if (cd_bus->get_type() == BusType::Reg) {
         // rss says with CDB that a reg is ready
@@ -60,19 +39,23 @@ namespace arima {
 
       if (mem_bus->get_type() == BusType::Reg) {
         // lsb says with memB that a reg is ready
+        // from issue to write
         auto e = mem_bus->read();
         int rob_id = e.first;
         rob[rob_id].value = e.second;
         rob[rob_id].status = Write;
       } else if (mem_bus->get_type() == BusType::Mem) {
         // lsb says with memB that a store is written successfully
+        // then we can commit the store instruction
         auto e = mem_bus->read();
         int rob_id = e.first;
-        if (e.second) rob[rob_id].status = Write;
+        if (e.second) rob[rob_id].status = Commit;
       }
+    }
 
-      // commit
-      if (new_rob.front().status == Write) {
+    void ReorderBuffer::commit(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb) {
+      if (new_rob.empty()) return;
+      if (new_rob.front().status == Write || new_rob.front().status == Commit) {
         new_rob.front().status = Commit;
         auto &entry = new_rob.front();
         int rob_id = new_rob.get_front();
@@ -87,12 +70,19 @@ namespace arima {
         } else if (entry.ins.type == opType::S) {
           // set store ready = 1 in lsb
         } else if (entry.ins.type == opType::B) {
-          if (entry.value) {
-            dec.set_pc(entry.ins.imm);
-          }
+
         } else if (entry.ins.type == opType::J) {
-          dec.set_pc(entry.value);
+
         }
+        new_rob.pop();
       }
+
+    }
+
+    // issue--(result broadcast received(for ST, when it's all ready))->write
+    // --(ST ? stored successfully : head)->commit
+    void ReorderBuffer::execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb) {
+      update(dec, reg, lsb);
+      commit(dec, reg, lsb);
     }
 }

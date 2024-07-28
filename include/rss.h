@@ -16,21 +16,23 @@ namespace arima {
 
     class ReservationStation {
     public:
-      RssEntry rss[RS_SIZE];
+      arr<RssEntry, RS_SIZE> rss;
     private:
-      RssEntry next_rss[RS_SIZE];
-    public:
-      int find_empty() {
-        for (int i = 0; i < RS_SIZE; i++)
-          if (!rss[i].busy) return i;
-        return -1;
-      }
+      Bus *cd_bus, *mem_bus;
+      Bus *new_cd_bus, *new_mem_bus;
+      arr<RssEntry, RS_SIZE> new_rss;
 
-      bool full(){
-        for (int i = 0; i < RS_SIZE; i++)
-          if (!rss[i].busy) return false;
-        return true;
-      }
+      void update();
+    public:
+      int find_empty();
+
+      bool full();
+
+      void add(const RssEntry &entry);
+
+      void flush();
+
+      void execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
     };
 }
 

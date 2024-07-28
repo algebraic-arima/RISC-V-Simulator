@@ -18,9 +18,8 @@ add_executable(code
         src/regfile.cpp
         include/regfile.h
         include/alu.h
-        src/alu.cpp
-        include/state.h
         include/rss.h
         include/rob.h
         src/rob.cpp
-        include/bus.h)
+        include/bus.h
+        src/rss.cpp)
