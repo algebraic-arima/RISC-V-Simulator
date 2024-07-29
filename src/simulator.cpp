@@ -1,0 +1,59 @@
+#include "simulator.h"
+
+namespace arima {
+    Simulator::Simulator() {
+      dec = Decoder();
+      reg = RegFile();
+      lsb = LoadStoreBuffer();
+      rss = ReservationStation();
+      rob = ReorderBuffer();
+      cd_bus = Bus();
+      mem_bus = Bus();
+      new_cd_bus = Bus();
+      new_mem_bus = Bus();
+      dec.cd_bus = &cd_bus;
+      dec.mem_bus = &mem_bus;
+      rob.cd_bus = &cd_bus;
+      rob.mem_bus = &mem_bus;
+      rss.cd_bus = &cd_bus;
+      rss.mem_bus = &mem_bus;
+      lsb.mem_bus = &mem_bus;
+      dec.new_cd_bus = &new_cd_bus;
+      dec.new_mem_bus = &new_mem_bus;
+      rob.new_cd_bus = &new_cd_bus;
+      rob.new_mem_bus = &new_mem_bus;
+      rss.new_cd_bus = &new_cd_bus;
+      rss.new_mem_bus = &new_mem_bus;
+      lsb.new_mem_bus = &new_mem_bus;
+    }
+
+    void Simulator::run() {
+      try {
+        while (true) {
+          flush();
+          execute();
+        }
+      } catch (word &res) {
+        std::cout << (res & 0xff) << std::endl;
+        std::cout << "Fail rate: " << dec.pred.get_mispredict_rate() << std::endl;
+        return;
+      }
+    }
+
+    void Simulator::flush(){
+      dec.flush();
+      reg.flush();
+      lsb.flush();
+      rss.flush();
+      rob.flush();
+    }
+
+    void Simulator::execute(){
+      dec.execute(reg, rob, lsb, rss);
+      rss.execute();
+      rob.execute(dec, reg, lsb);
+      lsb.execute();
+      rob.update(reg, lsb);
+      rob.commit(reg);
+    }
+}

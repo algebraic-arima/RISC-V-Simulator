@@ -70,7 +70,7 @@ enum opCode {
   AND,                       // and
 };
 
-word signExt(word input, int size) {
+word SEXT(word input, int size) {
   word mask = (word) 1 << (size - 1);
   return (input ^ mask) - mask;
 }
@@ -350,14 +350,14 @@ public:
                     | ((input >> 12 & 0b11111111) << 12)
                     | ((input >> 20 & 0b1) << 11)
                     | (input >> 21 & 0b1111111111) << 1;
-          ins.imm = signExt(ins.imm, 21);
+          ins.imm = SEXT(ins.imm, 21);
         } else {
           ins.type = opType::I;
           ins.code = opCode::JALR;
           ins.rd = (input >> 7) & 0b11111;
           ins.imm = input >> 20;
           ins.rs1 = (input >> 15) & 0b11111;
-          ins.imm = signExt(ins.imm, 12);
+          ins.imm = SEXT(ins.imm, 12);
         }
       }
       return;
@@ -371,27 +371,27 @@ public:
                 | (input >> 25 & 0b111111) << 5
                 | (input >> 8 & 0b1111) << 1
                 | (input >> 7 & 0b1) << 11;
-      ins.imm = signExt(ins.imm, 13);
+      ins.imm = SEXT(ins.imm, 13);
       decode_branch(input, ins);
       return;
     } else if (opn == 0b0000) {
       ins.type = opType::I;
       ins.rs1 = (input >> 15) & 0b11111;
       ins.rd = (input >> 7) & 0b11111;
-      ins.imm = signExt(input >> 20, 12);
+      ins.imm = SEXT(input >> 20, 12);
       decode_load(input, ins);
     } else if (opn == 0b0100) {
       ins.type = opType::S;
       ins.rs1 = (input >> 15) & 0b11111;
       ins.rs2 = (input >> 20) & 0b11111;
       ins.imm = input >> 25 << 5 | ((input >> 7) & 0b11111);
-      ins.imm = signExt(ins.imm, 12);
+      ins.imm = SEXT(ins.imm, 12);
       decode_store(input, ins);
     } else if (opn == 0b0010) {
       ins.type = opType::I;
       ins.rs1 = (input >> 15) & 0b11111;
       ins.rd = (input >> 7) & 0b11111;
-      ins.imm = signExt(input >> 20, 12);
+      ins.imm = SEXT(input >> 20, 12);
       decode_arithi(input, ins);
     } else if (opn == 0b0110) {
       ins.type = opType::R;
@@ -514,10 +514,10 @@ public:
         state->reg[op.rd] = op.imm;
         return;
       case opCode::LB:
-        state->reg[op.rd] = signExt(mem->ldb(state->reg[op.rs1] + op.imm), 8);
+        state->reg[op.rd] = SEXT(mem->ldb(state->reg[op.rs1] + op.imm), 8);
         return;
       case opCode::LH:
-        state->reg[op.rd] = signExt(mem->ldh(state->reg[op.rs1] + op.imm), 16);
+        state->reg[op.rd] = SEXT(mem->ldh(state->reg[op.rs1] + op.imm), 16);
         return;
       case opCode::LW:
         state->reg[op.rd] = mem->ldw(state->reg[op.rs1] + op.imm);

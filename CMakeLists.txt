@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.26)
 project(code)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 include_directories(include)
 include_directories(src)
@@ -22,4 +22,8 @@ add_executable(code
         include/rob.h
         src/rob.cpp
         include/bus.h
-        src/rss.cpp)
+        src/rss.cpp
+        src/simulator.cpp
+        include/simulator.h
+        main.cpp
+        include/utils.cpp)

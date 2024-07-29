@@ -1,10 +1,14 @@
 #ifndef RISCV_RSS_H
 #define RISCV_RSS_H
 
-#include "decoder.h"
 #include "utils.h"
+#include "alu.h"
+#include "bus.h"
 
 namespace arima {
+
+    class Decoder;
+
     struct RssEntry {
       bool busy = false;
       Instruction ins{};
@@ -17,12 +21,16 @@ namespace arima {
     class ReservationStation {
     public:
       arr<RssEntry, RS_SIZE> rss;
-    private:
+      ALU alu;
+      bool reset = false, new_reset = false;
       Bus *cd_bus, *mem_bus;
       Bus *new_cd_bus, *new_mem_bus;
+    private:
+
       arr<RssEntry, RS_SIZE> new_rss;
 
       void update();
+
     public:
       int find_empty();
 
@@ -32,7 +40,9 @@ namespace arima {
 
       void flush();
 
-      void execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
+      void clear();
+
+      void execute();
     };
 }
 

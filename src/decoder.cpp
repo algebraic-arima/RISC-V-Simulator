@@ -1,8 +1,4 @@
 #include "decoder.h"
-#include "param.h"
-#include "utils.h"
-#include "state.h"
-#include "rss.h"
 
 namespace arima {
 
@@ -355,15 +351,14 @@ namespace arima {
     void Decoder::execute(RegFile &reg,
                           ReorderBuffer &rob,
                           LoadStoreBuffer &lsb,
-                          ReservationStation &rss,
-                          MemoryController &mem) {
+                          ReservationStation &rss) {
       push_rss = false, push_lsb = false, push_rob = false;
       //bug: decoder has to query the mem_bus and cd_bus
       if (freeze) {
         return;
       }
       Instruction ins;
-      word instr = fetch(mem);
+      word instr = fetch(lsb.mem);
       decode(instr, ins);
       parse(ins, reg, rob, lsb, rss);
       if (push_rob && push_rss) {

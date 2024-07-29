@@ -18,14 +18,19 @@ namespace arima {
     };
 
     class LoadStoreBuffer {
+    public:
       cir_queue<LsbEntry, LSB_SIZE> lsb;
-      Bus *mem_bus;
-      Bus *new_mem_bus;
+      Bus *mem_bus{},*new_mem_bus{};
+      bool reset = false, new_reset = false;
+      MemoryController mem;
     private:
       cir_queue<LsbEntry, LSB_SIZE> new_lsb;
-      MemoryController mem;
 
     public:
+
+      LoadStoreBuffer(){
+        mem = MemoryController("../testcases/sample.data");
+      }
 
       bool empty() { return lsb.empty(); }
 

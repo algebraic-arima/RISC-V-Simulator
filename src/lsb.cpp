@@ -1,5 +1,4 @@
 #include "lsb.h"
-#include "bus.h"
 
 namespace arima {
     void LoadStoreBuffer::add(const LsbEntry &entry) {
@@ -19,6 +18,11 @@ namespace arima {
     }
 
     void LoadStoreBuffer::execute() {
+      if (reset) {
+        new_lsb.clear();
+        new_reset = false;
+        return;
+      }
       if (mem_bus->get_type() == BusType::Reg) {
         auto e = mem_bus->read();
         int reg = e.first;

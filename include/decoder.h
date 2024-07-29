@@ -2,12 +2,13 @@
 #define RISCV_DECODER_H
 
 #include "param.h"
-#include "memory.h"
-#include "state.h"
+#include "lsb.h"
 #include "rob.h"
 #include "rss.h"
 
 namespace arima {
+
+    struct RobEntry;
 
     class Predictor {
       int branch_num = 0;
@@ -34,8 +35,10 @@ namespace arima {
     public:
       word instrAddr = 0;
       word new_instrAddr = 0;
-      bool freeze = false;
-      bool new_freeze = false;
+      bool freeze = false, new_freeze = false;
+      bool fail = false, new_fail = false;
+      Bus *cd_bus{}, *mem_bus{};
+      Bus *new_cd_bus{}, *new_mem_bus{};
       Predictor pred;
 
       void decode(word, Instruction &);
@@ -51,8 +54,7 @@ namespace arima {
       void execute(RegFile &reg,
                    ReorderBuffer &rob,
                    LoadStoreBuffer &lsb,
-                   ReservationStation &rss,
-                   MemoryController &mem);
+                   ReservationStation &rss);
 
       void flush();
 

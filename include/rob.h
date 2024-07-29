@@ -3,9 +3,9 @@
 
 #include "param.h"
 #include "utils.h"
-#include "regfile.h"
+#include "rss.h"
 #include "lsb.h"
-#include "decoder.h"
+#include "regfile.h"
 
 namespace arima {
 
@@ -24,18 +24,20 @@ namespace arima {
 
     class ReorderBuffer {
       cir_queue<RobEntry, ROB_SIZE> new_rob;
-      Bus *cd_bus,*mem_bus;
-      Bus *new_cd_bus,*new_mem_bus;
+
+      bool reset = false, new_reset = false;
     public:
       cir_queue<RobEntry, ROB_SIZE> rob;
+      Bus *cd_bus, *mem_bus;
+      Bus *new_cd_bus, *new_mem_bus;
 
       void add(const RobEntry &entry);
 
       void issue(const Instruction &, RegFile &, int);
 
-      void update(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
+      void update(RegFile &reg, LoadStoreBuffer &lsb);
 
-      void commit(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
+      void commit(RegFile &reg);
 
       bool empty() { return rob.empty(); }
 
@@ -43,7 +45,7 @@ namespace arima {
 
       int get_empty() const { return rob.full() ? -1 : rob.tail; }
 
-      int get_front() const{ return rob.head; }
+      int get_front() const { return rob.head; }
 
       int get_value(int i) { return rob[i].value; }
 
@@ -52,6 +54,7 @@ namespace arima {
       void flush();
 
       void execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb);
+
 
     };
 }

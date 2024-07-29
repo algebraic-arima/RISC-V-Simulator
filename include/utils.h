@@ -4,10 +4,7 @@
 #include "param.h"
 
 namespace arima {
-    word signExt(word input, int size) {
-      word mask = 1 << (size - 1);
-      return (input ^ mask) - mask;
-    }
+    word signExt(word, int);
 
     template<class T, int size>
     class arr {
@@ -79,6 +76,10 @@ namespace arima {
 
       cir_queue() {
         data = new T[size];
+        head = tail = 0;
+      }
+
+      void clear() {
         head = tail = 0;
       }
 

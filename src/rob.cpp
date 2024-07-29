@@ -14,7 +14,7 @@ namespace arima {
       rob = new_rob;
     }
 
-    void ReorderBuffer::update(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb) {
+    void ReorderBuffer::update(RegFile &reg, LoadStoreBuffer &lsb) {
       if (new_rob.empty()) return;
       if (cd_bus->get_type() == BusType::Reg) {
         // rss says with CDB that a reg is ready
@@ -53,10 +53,11 @@ namespace arima {
       }
     }
 
-    void ReorderBuffer::commit(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb) {
+    void ReorderBuffer::commit(RegFile &reg) {
       if (new_rob.empty()) return;
-      if (new_rob.front().status == Write || new_rob.front().status == Commit) {
-        new_rob.front().status = Commit;
+      auto &e = new_rob.front();
+      if (e.status == Write || e.status == Commit) {
+        e.status = Commit;
         auto &entry = new_rob.front();
         int rob_id = new_rob.get_front();
         if (entry.ins.type == opType::I
@@ -70,7 +71,9 @@ namespace arima {
         } else if (entry.ins.type == opType::S) {
           // set store ready = 1 in lsb
         } else if (entry.ins.type == opType::B) {
+          if (entry.value) {
 
+          }
         } else if (entry.ins.type == opType::J) {
 
         }
@@ -82,7 +85,7 @@ namespace arima {
     // issue--(result broadcast received(for ST, when it's all ready))->write
     // --(ST ? stored successfully : head)->commit
     void ReorderBuffer::execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb) {
-      update(dec, reg, lsb);
-      commit(dec, reg, lsb);
+      update(reg, lsb);
+      commit(reg);
     }
 }
