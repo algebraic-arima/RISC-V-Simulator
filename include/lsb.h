@@ -48,7 +48,7 @@ namespace arima {
       // Print table rows
       for (auto &e: lsb) {
         std::cout << std::left << std::setw(10) << e.ready
-                  << std::setw(10) << e.code
+                  << std::setw(10) << opCodeStr[e.code]
                   << std::setw(10) << e.vj
                   << std::setw(10) << e.vk
                   << std::setw(10) << e.qj

@@ -48,7 +48,7 @@ namespace arima {
       // Print table rows
       for (int i = 0; i < RS_SIZE; i++) {
         std::cout << std::left << std::setw(10) << rss[i].busy
-                  << std::setw(10) << rss[i].ins.code
+                  << std::setw(10) << opCodeStr[rss[i].ins.code]
                   << std::setw(10) << rss[i].vj
                   << std::setw(10) << rss[i].vk
                   << std::setw(10) << rss[i].qj

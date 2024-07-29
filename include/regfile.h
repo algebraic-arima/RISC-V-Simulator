@@ -34,8 +34,6 @@ namespace arima {
       std::cout << std::dec;
     }
 
-      word &operator[](std::size_t);
-
       word operator[](std::size_t) const;
 
       void set_dep(std::size_t, int);

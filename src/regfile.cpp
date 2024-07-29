@@ -8,10 +8,6 @@ namespace arima {
       }
     }
 
-    word &RegFile::operator[](std::size_t idx) {
-      return reg[idx].val;
-    }
-
     word RegFile::operator[](std::size_t idx) const {
       return reg[idx].val;
     }
