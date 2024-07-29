@@ -40,9 +40,13 @@ namespace arima {
       cd_bus = new_cd_bus;
       dec.flush();
       reg.flush();
+      reg.display();
       lsb.flush();
+      lsb.display();
       rss.flush();
+      rss.display();
       rob.flush();
+      rob.display();
     }
 
     void Simulator::execute() {
@@ -50,7 +54,5 @@ namespace arima {
       rss.execute();
       rob.execute(dec, reg, lsb);
       lsb.execute();
-      rob.update(reg, lsb);
-      rob.commit(reg);
     }
 }

@@ -13,7 +13,7 @@ namespace arima {
     class Predictor {
       int branch_num = 0;
       int correct_num = 0;
-      int counter = 1;
+      int counter = 2;
     public:
       Predictor() = default;
 

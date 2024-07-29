@@ -257,13 +257,18 @@ namespace arima {
         return;
       }
       if (ins.code == AUIPC) {
+        push_rob = true;
         new_rob = {Issue, ins, ins.rd, static_cast<int>((instrAddr + ins.imm))};
       } else if (ins.code == opCode::LUI) {
-        new_rob = {Issue, ins, ins.rd, ins.imm};
+        push_rob = true;
+        new_rob = {Write, ins, ins.rd, ins.imm};
       } else if (ins.code == JAL) {
-        new_rob = {Issue, ins, ins.rd, static_cast<int>(instrAddr + 4)};
-        new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
+        push_rob = true;
+        new_rob = {Write, ins, ins.rd, static_cast<int>(instrAddr + 4)};
+        new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
+        return;
       } else if (ins.code == JALR) {
+        push_rss = push_rob = true;
         new_rob = {Issue, ins, ins.rd, static_cast<int>(instrAddr + 4)};
         new_rss = {true, ins, 0, ins.imm, -1, -1, 0, rob.get_empty()};
         if (int r_i = reg.get_dep(ins.rs1) != -1) {
@@ -275,6 +280,7 @@ namespace arima {
         }
         new_freeze = true;
       } else if (ins.type == R) {
+        push_rss = push_rob = true;
         new_rob = {Issue, ins, ins.rd, 0};
         new_rss = {true, ins, 0, 0, -1, -1, 0, rob.get_empty()};
         if (int r_i = reg.get_dep(ins.rs1) != -1) {
@@ -292,17 +298,20 @@ namespace arima {
           new_rss.vk = reg[ins.rs2];
         }
       } else if (ins.type == I) {
+        push_rob = true;
         new_rob = {Issue, ins, ins.rd, 0};
         if (ins.code == LB || ins.code == LH || ins.code == LW || ins.code == LBU || ins.code == LHU) {
+          push_lsb = true;
           new_lsb = {true, ins.code, 0, 0, -1, -1, ins.imm, rob.get_empty()};
           if (int r_i = reg.get_dep(ins.rs1) != -1) {
             if (rob.get_state(r_i) != Write)
-              new_rss.qj = r_i;
-            else new_rss.vj = rob.get_value(r_i);
+              new_lsb.qj = r_i;
+            else new_lsb.vj = rob.get_value(r_i);
           } else {
             new_lsb.vj = reg[ins.rs1];
           }
         } else {
+          push_rss=true;
           new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
           if (int r_i = reg.get_dep(ins.rs1) != -1) {
             if (rob.get_state(r_i) != Write)
@@ -313,6 +322,7 @@ namespace arima {
           }
         }
       } else if (ins.type == S) {
+        push_rob = push_lsb = true;
         new_rob = {Issue, ins, static_cast<word>(-1), 0};
         new_lsb = {false, ins.code, 0, 0, -1, -1, ins.imm, rob.get_empty()};
         if (int r_i = reg.get_dep(ins.rs1) != -1) {
@@ -326,6 +336,7 @@ namespace arima {
           new_lsb.vk = reg[ins.rs2];
         }
       } else if (ins.type == B) {
+        push_rob = push_rss = true;
         new_rob = {Issue, ins, static_cast<word>(-1), 0};
         new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
         if (int r_i = reg.get_dep(ins.rs1) != -1) {
@@ -340,7 +351,9 @@ namespace arima {
         }
         new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
         new_rob.value = pred.predict();// 1 for jump, 0 for not
+        return;
       }
+      new_instrAddr = instrAddr + 4;
     }
 
     void Decoder::flush() {
@@ -349,8 +362,11 @@ namespace arima {
     }
 
     std::ostream &operator<<(std::ostream &os, const Instruction &ins) {
-      os << "Instruction{type: " << ins.type << ", code: " << ins.code << ", imm: " << ins.imm << ", rd: " << ins.rd
-         << ", rs1: " << ins.rs1 << ", rs2: " << ins.rs2 << "}";
+      os << "Instruction{code: " << opCodeStr[ins.code] << ", imm: " << std::hex << ins.imm;
+      if (ins.rd < 37 && ins.rd >= 0) os << ", rd: " << regStr[ins.rd];
+      if (ins.rs1 < 37 && ins.rs1 >= 0) os << ", rs1: " << regStr[ins.rs1];
+      if (ins.rs2 < 37 && ins.rs2 >= 0) os << ", rs2: " << regStr[ins.rs2];
+      os << "}" << std::dec;
       return os;
     }
 
@@ -358,19 +374,24 @@ namespace arima {
                           ReorderBuffer &rob,
                           LoadStoreBuffer &lsb,
                           ReservationStation &rss) {
-      push_rss = false, push_lsb = false, push_rob = false;
-      //bug: decoder has to query the mem_bus and cd_bus
       if (freeze) {
         return;
       }
+
+      push_rss = false, push_lsb = false, push_rob = false;
+      // bug: decoder has to query the mem_bus and cd_bus
+
       Instruction ins;
       word instr = fetch(lsb.mem);
       decode(instr, ins);
       parse(ins, reg, rob, lsb, rss);
-      std::cout << ins.code << std::endl;
-      if (push_rob && push_rss) {
-        reg.set_dep(new_rob.dest, rob.get_empty()); // set dependence
+      std::cout << ins << std::endl;
+      if (push_rob) {
+        if (new_rob.dest >= 0 && new_rob.dest < 32)
+          reg.set_dep(new_rob.dest, rob.get_empty()); // set dependence
         rob.add(new_rob);
+      }
+      if (push_rss) {
         rss.add(new_rss);
       }
       if (push_lsb) {

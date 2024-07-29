@@ -3,21 +3,23 @@
 
 #include <cstdint>
 #include <iostream>
+#include <iomanip>
+
 
 namespace arima {
     typedef uint8_t byte;
     typedef uint16_t hword;
     typedef uint32_t word;
 
-    const int RAM_SIZE = 1 << 16;
+    const int RAM_SIZE = 1 << 18;
 
     const int REG_SIZE = 32;
 
-    const int RS_SIZE = 32;
+    const int RS_SIZE = 4;
 
-    const int ROB_SIZE = 32;
+    const int ROB_SIZE = 4;
 
-    const int LSB_SIZE = 32;
+    const int LSB_SIZE = 4;
 
     enum opType {
       U,
@@ -26,6 +28,29 @@ namespace arima {
       I,
       S,
       R,
+    };
+
+    const std::string regStr[32] = {
+            "zero", "ra", "sp", "gp",
+            "tp", "t0", "t1", "t2",
+            "s0", "s1", "a0", "a1",
+            "a2", "a3", "a4", "a5",
+            "a6", "a7", "s2", "s3",
+            "s4", "s5", "s6", "s7",
+            "s8", "s9", "s10", "s11",
+            "t3", "t4", "t5", "t6"
+    };
+
+    const std::string opCodeStr[37]={
+            "LUI", "AUIPC", "JAL", "JALR",
+            "BEQ", "BNE", "BLT", "BGE",
+            "BLTU", "BGEU", "LB", "LH",
+            "LW", "LBU", "LHU", "SB",
+            "SH", "SW", "ADDI", "SLTI",
+            "SLTIU", "XORI", "ORI", "ANDI",
+            "SLLI", "SRLI", "SRAI", "ADD",
+            "SUB", "SLL", "SLT", "SLTU",
+            "XOR", "SRL", "SRA", "OR", "AND"
     };
 
     enum opCode {

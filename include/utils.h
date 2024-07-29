@@ -128,11 +128,11 @@ namespace arima {
       }
 
       T &operator[](int index) {
-        return data[(head + index) % size];
+        return data[index];
       }
 
       T operator[](int index) const {
-        return data[(head + index) % size];
+        return data[index];
       }
 
       T pop() {

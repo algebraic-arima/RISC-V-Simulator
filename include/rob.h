@@ -7,6 +7,7 @@
 #include "lsb.h"
 #include "regfile.h"
 
+
 namespace arima {
 
     enum RobState {
@@ -33,7 +34,27 @@ namespace arima {
 
       void add(const RobEntry &entry);
 
-      void issue(const Instruction &, RegFile &, int);
+
+      void display() {
+        if (rob.empty()) {
+          std::cout << "ROB is empty" << std::endl;
+          return;
+        }
+
+        std::cout << "Reorder Buffer" << std::endl;
+        std::cout << std::left << std::setw(10) << "Status"
+                  << std::setw(10) << "Code"
+                  << std::setw(10) << "Dest"
+                  << std::setw(10) << "Value" << std::endl;
+
+        // Print table rows
+        for (auto &e: rob) {
+          std::cout << std::left << std::setw(10) << e.status
+                    << std::setw(10) << opCodeStr[e.ins.code]
+                    << std::setw(10) << e.dest
+                    << std::setw(10) << e.value << std::endl;
+        }
+      }
 
       void update(RegFile &reg, LoadStoreBuffer &lsb);
 

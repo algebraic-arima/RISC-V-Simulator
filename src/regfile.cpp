@@ -20,6 +20,10 @@ namespace arima {
       new_reg[idx].dep = dep;
     }
 
+    void RegFile::set_val(std::size_t idx, word val) {
+      new_reg[idx].val = val;
+    }
+
     int RegFile::get_dep(std::size_t idx) {
       return reg[idx].dep;
     }

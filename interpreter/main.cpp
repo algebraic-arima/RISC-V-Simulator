@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <csignal>
+#include <cstdint>
 
 #define vis
 
@@ -8,7 +8,7 @@ typedef uint8_t byte;
 typedef uint16_t hword;
 typedef uint32_t word;
 
-const int RAM_SIZE = 1 << 20;
+const int RAM_SIZE = 1 << 18;
 
 const int REG_SIZE = 32;
 
@@ -543,6 +543,17 @@ public:
   }
 };
 
+std::string reg_str[32] = {
+        "zero", "ra", "sp", "gp",
+        "tp", "t0", "t1", "t2",
+        "s0", "s1", "a0", "a1",
+        "a2", "a3", "a4", "a5",
+        "a6", "a7", "s2", "s3",
+        "s4", "s5", "s6", "s7",
+        "s8", "s9", "s10", "s11",
+        "t3", "t4", "t5", "t6"
+};
+
 class Simulator {
   State state;
   MemoryController mem;
@@ -553,13 +564,12 @@ public:
 
   explicit Simulator(const char *filename) : mem(filename) {}
 
-  void display() {
-    std::cout << "pc = " << std::hex << state.pc << std::endl;
+  void display(std::ostream &os) {
+    os << "pc = " << std::hex << state.pc << std::endl;
     for (int i = 0; i < 32; i++) {
-      std::cout << "reg[" << i << "] = " << state.reg[i] << "\n";
+      os << reg_str[i] << " = " << state.reg[i] << "\n";
     }
-    std::cout << std::endl;
-
+    os << std::endl;
   }
 
   void run() {
@@ -574,12 +584,10 @@ public:
         std::cout << (state.reg[10] & 0xff) << std::endl;
         break;
       }
-#ifdef vis
-      display();
-#endif
       state.pc += 4;
 #ifdef vis
-      sleep(1);
+      std::ofstream of("../log/sample.log", std::ios::app);
+      display(of);
 #endif
     }
   }
@@ -587,7 +595,7 @@ public:
 };
 
 int main() {
-  Simulator s;
+  Simulator s("F:/vscode/RISC-V-Simulator/testcases/sample.data");
   s.run();
   return 0;
 }

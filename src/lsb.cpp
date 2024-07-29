@@ -18,6 +18,7 @@ namespace arima {
     }
 
     void LoadStoreBuffer::execute() {
+      if(lsb.empty()) return;
       if (reset) {
         new_lsb.clear();
         new_reset = false;
@@ -40,7 +41,6 @@ namespace arima {
       }
       // todo: read from cdb to fetch dependency
 
-      if (new_lsb.empty()) return;
       LsbEntry entry = new_lsb.front();
       word result;
       if (!entry.ready || entry.qj != -1 || entry.qk != -1) {

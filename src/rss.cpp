@@ -15,7 +15,7 @@ namespace arima {
 
     void ReservationStation::add(const RssEntry &entry) {
       int idx = find_empty();
-      rss[idx] = entry;
+      new_rss[idx] = entry;
     }
 
     void ReservationStation::flush() {
@@ -27,19 +27,23 @@ namespace arima {
       auto e = cd_bus->read();
       auto f = mem_bus->read();
       for (int i = 0; i < RS_SIZE; i++) {
-        if (rss[i].qj == e.first) {
-          rss[i].qj = -1;
-          rss[i].vj = e.second;
-        } else if (rss[i].qj == f.first) {
-          rss[i].qj = -1;
-          rss[i].vj = f.second;
+        if (e.first != -1) {
+          if (rss[i].qj == e.first) {
+            new_rss[i].qj = -1;
+            new_rss[i].vj = e.second;
+          } else if (rss[i].qj == f.first) {
+            new_rss[i].qj = -1;
+            new_rss[i].vj = f.second;
+          }
         }
-        if (rss[i].qk == e.first) {
-          rss[i].qk = -1;
-          rss[i].vk = e.second;
-        } else if (rss[i].qk == f.first) {
-          rss[i].qk = -1;
-          rss[i].vk = f.second;
+        if (f.first != -1) {
+          if (rss[i].qk == e.first) {
+            new_rss[i].qk = -1;
+            new_rss[i].vk = e.second;
+          } else if (rss[i].qk == f.first) {
+            new_rss[i].qk = -1;
+            new_rss[i].vk = f.second;
+          }
         }
       }
     }
@@ -60,97 +64,97 @@ namespace arima {
       update();
       for (int i = 0; i < RS_SIZE; i++) {
         if (rss[i].busy && rss[i].qj == -1 && rss[i].qk == -1) {
-          auto en = rss[i];
+          auto en = new_rss[i];
           switch (en.ins.code) {
             case ADDI:
-              rss[i].a = rss[i].vj + en.ins.imm;
+              new_rss[i].a = new_rss[i].vj + en.ins.imm;
               break;
             case SLTI:
-              rss[i].a = rss[i].vj < en.ins.imm;
+              new_rss[i].a = new_rss[i].vj < en.ins.imm;
               break;
             case SLTIU:
-              rss[i].a = (unsigned) rss[i].vj < (unsigned) en.ins.imm;
+              new_rss[i].a = (unsigned) new_rss[i].vj < (unsigned) en.ins.imm;
               break;
             case XORI:
-              rss[i].a = rss[i].vj ^ en.ins.imm;
+              new_rss[i].a = new_rss[i].vj ^ en.ins.imm;
               break;
             case ORI:
-              rss[i].a = rss[i].vj | en.ins.imm;
+              new_rss[i].a = new_rss[i].vj | en.ins.imm;
               break;
             case ANDI:
-              rss[i].a = rss[i].vj & en.ins.imm;
+              new_rss[i].a = new_rss[i].vj & en.ins.imm;
               break;
             case SLLI:
-              rss[i].a = rss[i].vj << en.ins.imm;
+              new_rss[i].a = new_rss[i].vj << en.ins.imm;
               break;
             case SRLI:
-              rss[i].a = (unsigned) rss[i].vj >> en.ins.imm;
+              new_rss[i].a = (unsigned) new_rss[i].vj >> en.ins.imm;
               break;
             case SRAI:
-              rss[i].a = (int) rss[i].vj >> en.ins.imm;
+              new_rss[i].a = (int) new_rss[i].vj >> en.ins.imm;
               break;
             case ADD:
-              rss[i].a = rss[i].vj + rss[i].vk;
+              new_rss[i].a = new_rss[i].vj + new_rss[i].vk;
               break;
             case SUB:
-              rss[i].a = rss[i].vj - rss[i].vk;
+              new_rss[i].a = new_rss[i].vj - new_rss[i].vk;
               break;
             case SLL:
-              rss[i].a = rss[i].vj << rss[i].vk;
+              new_rss[i].a = new_rss[i].vj << new_rss[i].vk;
               break;
             case SLT:
-              rss[i].a = rss[i].vj < rss[i].vk;
+              new_rss[i].a = new_rss[i].vj < new_rss[i].vk;
               break;
             case SLTU:
-              rss[i].a = (unsigned) rss[i].vj < (unsigned) rss[i].vk;
+              new_rss[i].a = (unsigned) new_rss[i].vj < (unsigned) new_rss[i].vk;
               break;
             case XOR:
-              rss[i].a = rss[i].vj ^ rss[i].vk;
+              new_rss[i].a = new_rss[i].vj ^ new_rss[i].vk;
               break;
             case SRL:
-              rss[i].a = (unsigned) rss[i].vj >> rss[i].vk;
+              new_rss[i].a = (unsigned) new_rss[i].vj >> new_rss[i].vk;
               break;
             case SRA:
-              rss[i].a = rss[i].vj >> rss[i].vk;
+              new_rss[i].a = new_rss[i].vj >> new_rss[i].vk;
               break;
             case OR:
-              rss[i].a = rss[i].vj | rss[i].vk;
+              new_rss[i].a = new_rss[i].vj | new_rss[i].vk;
               break;
             case AND:
-              rss[i].a = rss[i].vj & rss[i].vk;
+              new_rss[i].a = new_rss[i].vj & new_rss[i].vk;
               break;
             case JALR:
-              rss[i].a = rss[i].vj + en.ins.imm;
+              new_rss[i].a = new_rss[i].vj + en.ins.imm;
               break;
             case BEQ:
-              rss[i].a = rss[i].vj == rss[i].vk;
+              new_rss[i].a = new_rss[i].vj == new_rss[i].vk;
               break;
 
             case BNE:
-              rss[i].a = rss[i].vj != rss[i].vk;
+              new_rss[i].a = new_rss[i].vj != new_rss[i].vk;
               break;
             case BLT:
-              rss[i].a = rss[i].vj < rss[i].vk;
+              new_rss[i].a = new_rss[i].vj < new_rss[i].vk;
               break;
             case BGE:
-              rss[i].a = rss[i].vj >= rss[i].vk;
+              new_rss[i].a = new_rss[i].vj >= new_rss[i].vk;
               break;
             case BLTU:
-              rss[i].a = (unsigned) rss[i].vj < (unsigned) rss[i].vk;
+              new_rss[i].a = (unsigned) new_rss[i].vj < (unsigned) new_rss[i].vk;
               break;
             case BGEU:
-              rss[i].a = (unsigned) rss[i].vj >= (unsigned) rss[i].vk;
+              new_rss[i].a = (unsigned) new_rss[i].vj >= (unsigned) new_rss[i].vk;
               break;
             case JAL:
-              rss[i].a = rss[i].ins.imm;
+              new_rss[i].a = new_rss[i].ins.imm;
               break;
             default:
               break;
           }
 
-          new_cd_bus->write(BusType::Reg, rss[i].rob_dest, rss[i].a);
+          new_cd_bus->write(BusType::Reg, new_rss[i].rob_dest, new_rss[i].a);
 
-          rss[i].busy = false;
+          new_rss[i].busy = false;
           break; // complete a calculation in one cycle
 
         }

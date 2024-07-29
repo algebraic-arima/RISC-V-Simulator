@@ -28,6 +28,36 @@ namespace arima {
 
     public:
 
+
+    void display() {
+      if (lsb.empty()) {
+        std::cout << "LSB is empty" << std::endl;
+        return;
+      }
+
+      std::cout<<"Load Store Buffer"<<std::endl;
+      std::cout << std::left << std::setw(10) << "Ready"
+                << std::setw(10) << "Code"
+                << std::setw(10) << "VJ"
+                << std::setw(10) << "VK"
+                << std::setw(10) << "QJ"
+                << std::setw(10) << "QK"
+                << std::setw(10) << "A"
+                << std::setw(10) << "ROB Dest" << std::endl;
+
+      // Print table rows
+      for (auto &e: lsb) {
+        std::cout << std::left << std::setw(10) << e.ready
+                  << std::setw(10) << e.code
+                  << std::setw(10) << e.vj
+                  << std::setw(10) << e.vk
+                  << std::setw(10) << e.qj
+                  << std::setw(10) << e.qk
+                  << std::setw(10) << e.a
+                  << std::setw(10) << e.rob_dest << std::endl;
+      }
+    }
+
       LoadStoreBuffer() : mem("../testcases/sample.data") {}
 
       bool empty() { return lsb.empty(); }

@@ -32,6 +32,32 @@ namespace arima {
       void update();
 
     public:
+
+
+    void display() {
+      std::cout<<"Reservation Station"<<std::endl;
+      std::cout << std::left << std::setw(10) << "Busy"
+                << std::setw(10) << "Code"
+                << std::setw(10) << "VJ"
+                << std::setw(10) << "VK"
+                << std::setw(10) << "QJ"
+                << std::setw(10) << "QK"
+                << std::setw(10) << "A"
+                << std::setw(10) << "ROB Dest" << std::endl;
+
+      // Print table rows
+      for (int i = 0; i < RS_SIZE; i++) {
+        std::cout << std::left << std::setw(10) << rss[i].busy
+                  << std::setw(10) << rss[i].ins.code
+                  << std::setw(10) << rss[i].vj
+                  << std::setw(10) << rss[i].vk
+                  << std::setw(10) << rss[i].qj
+                  << std::setw(10) << rss[i].qk
+                  << std::setw(10) << rss[i].a
+                  << std::setw(10) << rss[i].rob_dest << std::endl;
+      }
+    }
+
       int find_empty();
 
       bool full();
