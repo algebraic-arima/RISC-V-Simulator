@@ -16,6 +16,8 @@ namespace arima {
 
       Simulator();
 
+      void init();
+
       void run();
 
       void flush();

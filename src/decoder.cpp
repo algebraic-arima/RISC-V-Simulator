@@ -348,6 +348,12 @@ namespace arima {
       freeze = new_freeze;
     }
 
+    std::ostream &operator<<(std::ostream &os, const Instruction &ins) {
+      os << "Instruction{type: " << ins.type << ", code: " << ins.code << ", imm: " << ins.imm << ", rd: " << ins.rd
+         << ", rs1: " << ins.rs1 << ", rs2: " << ins.rs2 << "}";
+      return os;
+    }
+
     void Decoder::execute(RegFile &reg,
                           ReorderBuffer &rob,
                           LoadStoreBuffer &lsb,
@@ -361,6 +367,7 @@ namespace arima {
       word instr = fetch(lsb.mem);
       decode(instr, ins);
       parse(ins, reg, rob, lsb, rss);
+      std::cout << ins.code << std::endl;
       if (push_rob && push_rss) {
         reg.set_dep(new_rob.dest, rob.get_empty()); // set dependence
         rob.add(new_rob);

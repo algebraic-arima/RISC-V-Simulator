@@ -2,15 +2,10 @@
 
 namespace arima {
     Simulator::Simulator() {
-      dec = Decoder();
-      reg = RegFile();
-      lsb = LoadStoreBuffer();
-      rss = ReservationStation();
-      rob = ReorderBuffer();
-      cd_bus = Bus();
-      mem_bus = Bus();
-      new_cd_bus = Bus();
-      new_mem_bus = Bus();
+      init();
+    }
+
+    void Simulator::init() {
       dec.cd_bus = &cd_bus;
       dec.mem_bus = &mem_bus;
       rob.cd_bus = &cd_bus;
@@ -40,7 +35,9 @@ namespace arima {
       }
     }
 
-    void Simulator::flush(){
+    void Simulator::flush() {
+      mem_bus = new_mem_bus;
+      cd_bus = new_cd_bus;
       dec.flush();
       reg.flush();
       lsb.flush();
@@ -48,7 +45,7 @@ namespace arima {
       rob.flush();
     }
 
-    void Simulator::execute(){
+    void Simulator::execute() {
       dec.execute(reg, rob, lsb, rss);
       rss.execute();
       rob.execute(dec, reg, lsb);

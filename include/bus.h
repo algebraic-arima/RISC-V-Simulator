@@ -18,6 +18,12 @@ namespace arima {
       int reg;
       word val;
     public:
+      Bus() {
+        type = BusType::Reg;
+        reg = -1;
+        val = 0;
+      }
+
       BusType get_type() const { return type; }
 
       void write(BusType t, int re, word va) {

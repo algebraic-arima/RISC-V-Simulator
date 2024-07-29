@@ -2,13 +2,14 @@
 #define RISCV_PARAM_H
 
 #include <cstdint>
+#include <iostream>
 
 namespace arima {
     typedef uint8_t byte;
     typedef uint16_t hword;
     typedef uint32_t word;
 
-    const int RAM_SIZE = 1 << 20;
+    const int RAM_SIZE = 1 << 16;
 
     const int REG_SIZE = 32;
 
@@ -117,7 +118,6 @@ namespace arima {
       int imm;
       word rd, rs1, rs2;
     };
-
 }
 
 #endif //RISCV_PARAM_H
