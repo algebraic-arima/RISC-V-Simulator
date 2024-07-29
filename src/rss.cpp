@@ -54,7 +54,6 @@ namespace arima {
       }
     }
 
-
     void ReservationStation::execute() {
       if (reset) {
         clear();

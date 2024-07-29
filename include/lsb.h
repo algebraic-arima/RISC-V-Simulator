@@ -20,6 +20,7 @@ namespace arima {
     class LoadStoreBuffer {
     public:
       cir_queue<LsbEntry, LSB_SIZE> lsb;
+      Bus *cd_bus{}, *new_cd_bus{};
       Bus *mem_bus{}, *new_mem_bus{};
       bool reset = false, new_reset = false;
       MemoryController mem;
@@ -29,34 +30,34 @@ namespace arima {
     public:
 
 
-    void display() {
-      if (lsb.empty()) {
-        std::cout << "LSB is empty" << std::endl;
-        return;
-      }
+      void display() {
+        if (lsb.empty()) {
+          std::cout << "LSB is empty" << std::endl;
+          return;
+        }
 
-      std::cout<<"Load Store Buffer"<<std::endl;
-      std::cout << std::left << std::setw(10) << "Ready"
-                << std::setw(10) << "Code"
-                << std::setw(10) << "VJ"
-                << std::setw(10) << "VK"
-                << std::setw(10) << "QJ"
-                << std::setw(10) << "QK"
-                << std::setw(10) << "A"
-                << std::setw(10) << "ROB Dest" << std::endl;
+        std::cout << "Load Store Buffer" << std::endl;
+        std::cout << std::left << std::setw(10) << "Ready"
+                  << std::setw(10) << "Code"
+                  << std::setw(10) << "VJ"
+                  << std::setw(10) << "VK"
+                  << std::setw(10) << "QJ"
+                  << std::setw(10) << "QK"
+                  << std::setw(10) << "A"
+                  << std::setw(10) << "ROB Dest" << std::endl;
 
-      // Print table rows
-      for (auto &e: lsb) {
-        std::cout << std::left << std::setw(10) << e.ready
-                  << std::setw(10) << opCodeStr[e.code]
-                  << std::setw(10) << e.vj
-                  << std::setw(10) << e.vk
-                  << std::setw(10) << e.qj
-                  << std::setw(10) << e.qk
-                  << std::setw(10) << e.a
-                  << std::setw(10) << e.rob_dest << std::endl;
+        // Print table rows
+        for (auto &e: lsb) {
+          std::cout << std::left << std::setw(10) << e.ready
+                    << std::setw(10) << opCodeStr[e.code]
+                    << std::setw(10) << e.vj
+                    << std::setw(10) << e.vk
+                    << std::setw(10) << e.qj
+                    << std::setw(10) << e.qk
+                    << std::setw(10) << e.a
+                    << std::setw(10) << e.rob_dest << std::endl;
+        }
       }
-    }
 
       LoadStoreBuffer() : mem("../testcases/sample.data") {}
 
@@ -66,7 +67,7 @@ namespace arima {
 
       void add(const LsbEntry &entry);
 
-      void set_ready(int rob_dest);
+      void set_ready();
 
       void flush();
 

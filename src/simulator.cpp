@@ -12,6 +12,7 @@ namespace arima {
       rob.mem_bus = &mem_bus;
       rss.cd_bus = &cd_bus;
       rss.mem_bus = &mem_bus;
+      lsb.cd_bus = &cd_bus;
       lsb.mem_bus = &mem_bus;
       dec.new_cd_bus = &new_cd_bus;
       dec.new_mem_bus = &new_mem_bus;
@@ -47,6 +48,8 @@ namespace arima {
       rss.display();
       rob.flush();
       rob.display();
+      std::cout << "mem_bus: " << mem_bus << std::endl;
+      std::cout << "cd_bus: " << cd_bus << std::endl;
     }
 
     void Simulator::execute() {

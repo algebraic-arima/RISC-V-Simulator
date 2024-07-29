@@ -58,7 +58,7 @@ namespace arima {
 
       void update(RegFile &reg, LoadStoreBuffer &lsb);
 
-      void commit(RegFile &reg);
+      void commit(RegFile &reg, LoadStoreBuffer &lsb);
 
       bool empty() { return rob.empty(); }
 

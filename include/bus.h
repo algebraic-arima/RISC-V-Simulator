@@ -1,3 +1,4 @@
+#pragma once
 #ifndef RISCV_BUS_H
 #define RISCV_BUS_H
 
@@ -10,14 +11,24 @@ namespace arima {
       Reg,
       Mem,
       PC,
+      STen,
+    };
+
+    const std::string busTypeStr[4] = {
+            "Reg",
+            "Mem",
+            "PC",
+            "STen",
     };
 
 
+
     class Bus {
+    public:
       BusType type;
       int reg;
       word val;
-    public:
+
       Bus() {
         type = BusType::Reg;
         reg = -1;
@@ -33,7 +44,14 @@ namespace arima {
       }
 
       std::pair<int, word> read() { return {reg, val}; }
+
+      friend std::ostream &operator<<(std::ostream &os, const Bus &bus) {
+        os << busTypeStr[static_cast<int>(bus.type)] << " " << bus.reg << " " << bus.val;
+        return os;
+      }
     };
+
+
 }
 
 #endif //RISCV_BUS_H

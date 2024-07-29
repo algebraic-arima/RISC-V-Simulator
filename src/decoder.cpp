@@ -311,7 +311,7 @@ namespace arima {
             new_lsb.vj = reg[ins.rs1];
           }
         } else {
-          push_rss=true;
+          push_rss = true;
           new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
           if (int r_i = reg.get_dep(ins.rs1) != -1) {
             if (rob.get_state(r_i) != Write)
@@ -325,12 +325,14 @@ namespace arima {
         push_rob = push_lsb = true;
         new_rob = {Issue, ins, static_cast<word>(-1), 0};
         new_lsb = {false, ins.code, 0, 0, -1, -1, ins.imm, rob.get_empty()};
-        if (int r_i = reg.get_dep(ins.rs1) != -1) {
+        int r_i = reg.get_dep(ins.rs1);
+        if (r_i != -1) {
           new_lsb.qj = r_i;
         } else {
           new_lsb.vj = reg[ins.rs1];
         }
-        if (int r_i = reg.get_dep(ins.rs2) != -1) {
+        r_i = reg.get_dep(ins.rs2);
+        if (r_i != -1) {
           new_lsb.qk = r_i;
         } else {
           new_lsb.vk = reg[ins.rs2];
@@ -374,6 +376,11 @@ namespace arima {
                           ReorderBuffer &rob,
                           LoadStoreBuffer &lsb,
                           ReservationStation &rss) {
+      for (auto &e: rob.rob) {
+        if (e.ins.code == JALR) {
+          new_freeze = false;
+        }
+      }
       if (freeze) {
         return;
       }

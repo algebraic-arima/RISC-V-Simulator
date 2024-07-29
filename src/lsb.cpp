@@ -5,12 +5,8 @@ namespace arima {
       new_lsb.push(entry);
     }
 
-    void LoadStoreBuffer::set_ready(int rob_dest) {
-      for (auto &entry: new_lsb) {
-        if (entry.rob_dest == rob_dest) {
-          entry.ready = true;
-        }
-      }
+    void LoadStoreBuffer::set_ready() {
+      new_lsb.front().ready = true;
     }
 
     void LoadStoreBuffer::flush() {
@@ -18,7 +14,7 @@ namespace arima {
     }
 
     void LoadStoreBuffer::execute() {
-      if(lsb.empty()) return;
+      if (lsb.empty()) return;
       if (reset) {
         new_lsb.clear();
         new_reset = false;
@@ -26,22 +22,45 @@ namespace arima {
       }
       if (mem_bus->get_type() == BusType::Reg) {
         auto e = mem_bus->read();
-        int reg = e.first;
-        word val = e.second;
-        for (auto &entry: lsb) {
-          if (entry.qj == reg) {
-            entry.vj = val;
-            entry.qj = -1;
+        if (e.first != -1) {
+          int reg = e.first;
+          word val = e.second;
+          for (auto &entry: new_lsb) {
+            if (entry.qj == reg) {
+              entry.vj = val;
+              entry.qj = -1;
+            }
+            if (entry.qk == reg) {
+              entry.vk = val;
+              entry.qk = -1;
+            }
           }
-          if (entry.qk == reg) {
-            entry.vk = val;
-            entry.qk = -1;
+        }
+      } else if (mem_bus->get_type() == BusType::STen) {
+        if (lsb.front().code == SB || lsb.front().code == SH || lsb.front().code == SW) {
+          lsb.front().ready = true;
+        }
+      }
+
+      if (cd_bus->get_type() == BusType::Reg) {
+        auto e = cd_bus->read();
+        if (e.first != -1) {
+          int reg = e.first;
+          word val = e.second;
+          for (auto &entry: new_lsb) {
+            if (entry.qj == reg) {
+              entry.vj = val;
+              entry.qj = -1;
+            }
+            if (entry.qk == reg) {
+              entry.vk = val;
+              entry.qk = -1;
+            }
           }
         }
       }
-      // todo: read from cdb to fetch dependency
 
-      LsbEntry entry = new_lsb.front();
+      LsbEntry entry = lsb.front();
       word result;
       if (!entry.ready || entry.qj != -1 || entry.qk != -1) {
         return;

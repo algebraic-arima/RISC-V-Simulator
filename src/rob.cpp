@@ -23,9 +23,7 @@ namespace arima {
           int rob_id = e.first;
           new_rob[rob_id].value = e.second;
           new_rob[rob_id].status = Write;
-          if (new_rob[rob_id].ins.type == S) {
-            lsb.set_ready(rob_id);
-          }// when ST changes to write, it is ready to be written to memory
+          // when ST changes to write, it is ready to be written to memory
           // when ST is written to memory, it is ready to be committed
         } else if (cd_bus->get_type() == BusType::PC) {
           // rss says with CDB that a branch is ready
@@ -57,16 +55,18 @@ namespace arima {
       }
     }
 
-    void ReorderBuffer::commit(RegFile &reg) {
+    void ReorderBuffer::commit(RegFile &reg, LoadStoreBuffer &lsb) {
       if (rob.empty()) return;
-      auto &entry = new_rob.front();
+      auto &entry = rob.front();
+      // if S is ready to be committed, then commit it
+      // and let lsb write
       if (entry.status == Write || entry.status == Commit) {
         entry.status = Commit;
         if (entry.ins.code == ADDI && entry.ins.rd == 10
             && entry.ins.rs1 == 0 && entry.ins.imm == 255) {
           throw reg[10];
         }
-        int rob_id = new_rob.get_front();
+        int rob_id = rob.get_front();
         if (entry.ins.type == opType::I
             || entry.ins.type == opType::R
             || entry.ins.type == opType::U) {
@@ -76,7 +76,7 @@ namespace arima {
             reg.set_val(dest, entry.value);
           }
         } else if (entry.ins.type == opType::S) {
-          // set store ready = 1 in lsb
+          // nothing
         } else if (entry.ins.type == opType::B) {
           if (entry.value) {
 
@@ -100,6 +100,9 @@ namespace arima {
         }
         new_rob.pop();
       }
+      if(new_rob.front().ins.type==S){
+        mem_bus->write(BusType::STen, 0, 0);
+      }
 
     }
 
@@ -107,6 +110,6 @@ namespace arima {
     // --(ST ? stored successfully : head)->commit
     void ReorderBuffer::execute(Decoder &dec, RegFile &reg, LoadStoreBuffer &lsb) {
       update(reg, lsb);
-      commit(reg);
+      commit(reg, lsb);
     }
 }
