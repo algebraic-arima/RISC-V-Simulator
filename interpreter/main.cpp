@@ -586,7 +586,7 @@ public:
       }
       state.pc += 4;
 #ifdef vis
-      std::ofstream of("../log/sample.log", std::ios::app);
+      std::ofstream of("../log/basicopt1.log", std::ios::app);
       display(of);
 #endif
     }
@@ -595,7 +595,7 @@ public:
 };
 
 int main() {
-  Simulator s("F:/vscode/RISC-V-Simulator/testcases/sample.data");
+  Simulator s("F:/vscode/RISC-V-Simulator/testcases/basicopt1.data");
   s.run();
   return 0;
 }

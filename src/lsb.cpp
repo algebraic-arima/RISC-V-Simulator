@@ -10,6 +10,12 @@ namespace arima {
     }
 
     void LoadStoreBuffer::flush() {
+      if (br_bus->get_type() == BusType::PC) {
+        auto e = br_bus->read();
+        if (e.first) {
+          new_lsb.clear();
+        }
+      }
       lsb = new_lsb;
     }
 
@@ -38,7 +44,9 @@ namespace arima {
         }
       } else if (mem_bus->get_type() == BusType::STen) {
         if (lsb.front().code == SB || lsb.front().code == SH || lsb.front().code == SW) {
-          lsb.front().ready = true;
+          if (mem_bus->read().first == lsb.front().rob_dest) {
+            new_lsb.front().ready = true;
+          }
         }
       }
 

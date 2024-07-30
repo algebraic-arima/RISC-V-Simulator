@@ -15,11 +15,11 @@ namespace arima {
 
     const int REG_SIZE = 32;
 
-    const int RS_SIZE = 4;
+    const int RS_SIZE = 8;
 
-    const int ROB_SIZE = 2;
+    const int ROB_SIZE = 16;
 
-    const int LSB_SIZE = 4;
+    const int LSB_SIZE = 8;
 
     enum opType {
       U,

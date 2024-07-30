@@ -8,6 +8,9 @@ namespace arima {
     }
 
     void Simulator::init() {
+      reg.br_bus = &br_bus;
+      reg.new_br_bus = &new_br_bus;
+
       dec.cd_bus = &cd_bus;
       dec.mem_bus = &mem_bus;
       dec.br_bus = &br_bus;
@@ -61,8 +64,8 @@ namespace arima {
       dec.flush();
       reg.flush();
       lsb.flush();
-      rss.flush();
       rob.flush();
+      rss.flush();
 #ifdef vis
       reg.display();
       lsb.display();
@@ -70,13 +73,14 @@ namespace arima {
       rob.display();
       std::cout << "mem_bus: " << mem_bus << std::endl;
       std::cout << "cd_bus: " << cd_bus << std::endl;
+      std::cout << "br_bus: " << br_bus << std::endl;
 #endif
     }
 
     void Simulator::execute() {
-      dec.execute(reg, rob, lsb, rss);
-      rss.execute();
-      rob.execute(dec, reg, lsb);
       lsb.execute();
+      rss.execute();
+      dec.execute(reg, rob, lsb, rss);
+      rob.execute(dec, reg, lsb);
     }
 }

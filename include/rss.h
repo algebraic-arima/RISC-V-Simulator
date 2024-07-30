@@ -22,7 +22,6 @@ namespace arima {
     public:
       arr<RssEntry, RS_SIZE> rss;
       ALU alu;
-      bool reset = false, new_reset = false;
       Bus *cd_bus{}, *mem_bus{}, *br_bus{};
       Bus *new_cd_bus{}, *new_mem_bus{}, *new_br_bus{};
     private:
@@ -32,7 +31,6 @@ namespace arima {
       void update();
 
     public:
-
 
       void display() {
         std::cout << "Reservation Station" << std::endl;

@@ -17,15 +17,13 @@ namespace arima {
         if (counter < 3) {
           counter++;
         }
+        correct_num++;
       } else {
         if (counter > 0) {
           counter--;
         }
       }
       branch_num++;
-      if (correct) {
-        correct_num++;
-      }
     }
 
     int Predictor::get_mispredict_rate() const {
@@ -256,9 +254,7 @@ namespace arima {
                         LoadStoreBuffer &lsb,
                         ReservationStation &rss) {
       push_rss = false, push_lsb = false, push_rob = false;
-      if (rss.full() || rob.full() || lsb.full()) {
-        return;
-      }
+
       if (ins.code == AUIPC) {
         push_rob = push_rss = true;
         new_rob = {Issue, ins, ins.rd, static_cast<int>((instrAddr + ins.imm))};
@@ -271,7 +267,7 @@ namespace arima {
         push_rob = push_rss = true;
         new_rob = {Issue, ins, ins.rd, static_cast<int>(instrAddr + 4)};
         new_rss = {true, ins, 0, 0, -1, -1, static_cast<int>(instrAddr + 4), rob.get_empty()};
-        new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
+        new_instrAddr = instrAddr + ins.imm;
         return;
       } else if (ins.code == JALR) {
         push_rss = push_rob = true;
@@ -361,7 +357,7 @@ namespace arima {
         }
       } else if (ins.type == B) {
         push_rob = push_rss = true;
-        new_rob = {Issue, ins, static_cast<word>(-1), 0};
+        new_rob = {Issue, ins, 0, 0};
         new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
         int r_i = reg.get_dep(ins.rs1);
         if (r_i != -1) {
@@ -383,15 +379,24 @@ namespace arima {
         }
         new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
         new_rob.value = pred.predict(); // 1 for jump, 0 for not
+        if (new_rob.value) new_rob.dest = instrAddr + 4;
+        else new_rob.dest = instrAddr + ins.imm;
+        // dest is the PC after a prediction fail
         return;
       }
       new_instrAddr = instrAddr + 4;
-
     }
 
     void Decoder::flush() {
       instrAddr = new_instrAddr;
       freeze = new_freeze;
+      if (br_bus->get_type() == BusType::PC) {
+        auto e = br_bus->read();
+        if (e.first) {
+          instrAddr = e.second;
+        }
+        pred.update(!e.first);
+      }
     }
 
     std::ostream &operator<<(std::ostream &os, const Instruction &ins) {
@@ -417,9 +422,11 @@ namespace arima {
       if (freeze) {
         return;
       }
+      if (rss.full() || rob.full() || lsb.full()) {
+        return;
+      }
 
       push_rss = false, push_lsb = false, push_rob = false;
-      // bug: decoder has to query the mem_bus and cd_bus
 
       Instruction ins;
       word instr = fetch(lsb.mem);
@@ -481,7 +488,7 @@ namespace arima {
         }
         lsb.add(new_lsb);
       }
-
+      // decoder has to query the mem_bus and cd_bus
     }
 
     void Decoder::melt() {

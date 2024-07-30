@@ -11,8 +11,8 @@ namespace arima {
       LoadStoreBuffer lsb;
       ReservationStation rss;
       ReorderBuffer rob;
-      Bus cd_bus{}, mem_bus{},br_bus{};
-      Bus new_cd_bus{}, new_mem_bus{},new_br_bus{};
+      Bus cd_bus{}, mem_bus{}, br_bus{};
+      Bus new_cd_bus{}, new_mem_bus{}, new_br_bus{};
 
       Simulator();
 
@@ -23,7 +23,6 @@ namespace arima {
       void flush();
 
       void execute();
-
 
     };
 }

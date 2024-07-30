@@ -25,6 +25,12 @@ namespace arima {
     }
 
     void RegFile::flush() {
+      auto e = br_bus->read();
+      if (br_bus->get_type() == BusType::PC && e.first) {
+        for (int i = 1; i < REG_SIZE; i++) {
+          new_reg[i].dep = -1;
+        }
+      }
       for (int i = 1; i < REG_SIZE; i++) {
         reg[i] = new_reg[i];
       }

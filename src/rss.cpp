@@ -1,6 +1,7 @@
 #include "rss.h"
 
 namespace arima {
+
     int ReservationStation::find_empty() {
       for (int i = 0; i < RS_SIZE; i++)
         if (!rss[i].busy) return i;
@@ -19,8 +20,14 @@ namespace arima {
     }
 
     void ReservationStation::flush() {
+      if (br_bus->get_type() == BusType::PC) {
+        auto e = br_bus->read();
+        if (e.first) {
+          for (int i = 0; i < RS_SIZE; i++)
+            new_rss[i].busy = false;
+        }
+      }
       rss = new_rss;
-      reset = new_reset;
     }
 
     void ReservationStation::update() {
@@ -57,11 +64,6 @@ namespace arima {
     }
 
     void ReservationStation::execute() {
-      if (reset) {
-        clear();
-        new_reset = false;
-        return;
-      }
       update();
       for (int i = 0; i < RS_SIZE; i++) {
         if (rss[i].busy && rss[i].qj == -1 && rss[i].qk == -1) {
@@ -152,9 +154,10 @@ namespace arima {
               break;
           }
 
-          if(en.ins.type!=B)
+          if (en.ins.type != B)
             new_cd_bus->write(BusType::Reg, new_rss[i].rob_dest, new_rss[i].a);
-          else{
+          else {
+            // for branch, a = 1 for branch taken, 0 for branch not taken
             new_cd_bus->write(BusType::PC, new_rss[i].rob_dest, new_rss[i].a);
           }
           new_rss[i].busy = false;

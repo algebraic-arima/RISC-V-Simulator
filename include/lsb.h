@@ -60,7 +60,7 @@ namespace arima {
         }
       }
 
-      LoadStoreBuffer() : mem("../testcases/sample.data") {}
+      LoadStoreBuffer() : mem("../testcases/basicopt1.data") {}
 
       bool empty() { return lsb.empty(); }
 
