@@ -27,7 +27,8 @@ namespace arima {
     }
 
     int Predictor::get_mispredict_rate() const {
-      return (branch_num - correct_num) * 100 / branch_num;
+//      return (branch_num - correct_num) * 100 / branch_num;
+      return 0;
     }
 
     word Decoder::fetch(MemoryController &mem) {
@@ -257,24 +258,29 @@ namespace arima {
         return;
       }
       if (ins.code == AUIPC) {
-        push_rob = true;
+        push_rob = push_rss = true;
         new_rob = {Issue, ins, ins.rd, static_cast<int>((instrAddr + ins.imm))};
+        new_rss = {true, ins, 0, 0, -1, -1, static_cast<int>(instrAddr + ins.imm), rob.get_empty()};
       } else if (ins.code == opCode::LUI) {
-        push_rob = true;
-        new_rob = {Write, ins, ins.rd, ins.imm};
+        push_rob = push_rss = true;
+        new_rob = {Issue, ins, ins.rd, ins.imm};
+        new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
       } else if (ins.code == JAL) {
-        push_rob = true;
-        new_rob = {Write, ins, ins.rd, static_cast<int>(instrAddr + 4)};
+        push_rob = push_rss = true;
+        new_rob = {Issue, ins, ins.rd, static_cast<int>(instrAddr + 4)};
+        new_rss = {true, ins, 0, 0, -1, -1, static_cast<int>(instrAddr + 4), rob.get_empty()};
         new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
         return;
       } else if (ins.code == JALR) {
         push_rss = push_rob = true;
         new_rob = {Issue, ins, ins.rd, static_cast<int>(instrAddr + 4)};
         new_rss = {true, ins, 0, ins.imm, -1, -1, 0, rob.get_empty()};
-        if (int r_i = reg.get_dep(ins.rs1) != -1) {
+        int r_i = reg.get_dep(ins.rs1);
+        if (r_i != -1) {
           if (rob.get_state(r_i) != Write)
             new_rss.qj = r_i;
-          else new_rss.vj = rob.get_value(r_i);
+          else
+            new_rss.vj = rob.get_value(r_i);
         } else {
           new_rss.vj = reg[ins.rs1];
         }
@@ -283,17 +289,21 @@ namespace arima {
         push_rss = push_rob = true;
         new_rob = {Issue, ins, ins.rd, 0};
         new_rss = {true, ins, 0, 0, -1, -1, 0, rob.get_empty()};
-        if (int r_i = reg.get_dep(ins.rs1) != -1) {
+        int r_i = reg.get_dep(ins.rs1);
+        if (r_i != -1) {
           if (rob.get_state(r_i) != Write)
             new_rss.qj = r_i;
-          else new_rss.vj = rob.get_value(r_i);
+          else
+            new_rss.vj = rob.get_value(r_i);
         } else {
           new_rss.vj = reg[ins.rs1];
         }
-        if (int r_i = reg.get_dep(ins.rs2) != -1) {
+        r_i = reg.get_dep(ins.rs2);
+        if (r_i != -1) {
           if (rob.get_state(r_i) != Write)
             new_rss.qk = r_i;
-          else new_rss.vk = rob.get_value(r_i);
+          else
+            new_rss.vk = rob.get_value(r_i);
         } else {
           new_rss.vk = reg[ins.rs2];
         }
@@ -303,7 +313,8 @@ namespace arima {
         if (ins.code == LB || ins.code == LH || ins.code == LW || ins.code == LBU || ins.code == LHU) {
           push_lsb = true;
           new_lsb = {true, ins.code, 0, 0, -1, -1, ins.imm, rob.get_empty()};
-          if (int r_i = reg.get_dep(ins.rs1) != -1) {
+          int r_i = reg.get_dep(ins.rs1);
+          if (r_i != -1) {
             if (rob.get_state(r_i) != Write)
               new_lsb.qj = r_i;
             else new_lsb.vj = rob.get_value(r_i);
@@ -313,10 +324,12 @@ namespace arima {
         } else {
           push_rss = true;
           new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
-          if (int r_i = reg.get_dep(ins.rs1) != -1) {
+          int r_i = reg.get_dep(ins.rs1);
+          if (r_i != -1) {
             if (rob.get_state(r_i) != Write)
               new_rss.qj = r_i;
-            else new_rss.vj = rob.get_value(r_i);
+            else
+              new_rss.vj = rob.get_value(r_i);
           } else {
             new_rss.vj = reg[ins.rs1];
           }
@@ -327,7 +340,10 @@ namespace arima {
         new_lsb = {false, ins.code, 0, 0, -1, -1, ins.imm, rob.get_empty()};
         int r_i = reg.get_dep(ins.rs1);
         if (r_i != -1) {
-          new_lsb.qj = r_i;
+          if (rob.get_state(r_i) != Write)
+            new_lsb.qj = r_i;
+          else
+            new_lsb.vj = rob.get_value(r_i);
         } else {
           new_lsb.vj = reg[ins.rs1];
         }
@@ -341,21 +357,24 @@ namespace arima {
         push_rob = push_rss = true;
         new_rob = {Issue, ins, static_cast<word>(-1), 0};
         new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
-        if (int r_i = reg.get_dep(ins.rs1) != -1) {
+        int r_i = reg.get_dep(ins.rs1);
+        if (r_i != -1) {
           new_rss.qj = r_i;
         } else {
           new_rss.vj = reg[ins.rs1];
         }
-        if (int r_i = reg.get_dep(ins.rs2) != -1) {
+        r_i = reg.get_dep(ins.rs2);
+        if (r_i != -1) {
           new_rss.qk = r_i;
         } else {
           new_rss.vk = reg[ins.rs2];
         }
         new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
-        new_rob.value = pred.predict();// 1 for jump, 0 for not
+        new_rob.value = pred.predict(); // 1 for jump, 0 for not
         return;
       }
       new_instrAddr = instrAddr + 4;
+
     }
 
     void Decoder::flush() {
@@ -376,9 +395,11 @@ namespace arima {
                           ReorderBuffer &rob,
                           LoadStoreBuffer &lsb,
                           ReservationStation &rss) {
+      new_freeze = false;
       for (auto &e: rob.rob) {
         if (e.ins.code == JALR) {
-          new_freeze = false;
+          new_freeze = true;
+          new_instrAddr = e.value;
         }
       }
       if (freeze) {
@@ -392,16 +413,60 @@ namespace arima {
       word instr = fetch(lsb.mem);
       decode(instr, ins);
       parse(ins, reg, rob, lsb, rss);
+#ifdef vis
       std::cout << ins << std::endl;
+#endif
+      auto e = cd_bus->read();
+      auto f = mem_bus->read();
       if (push_rob) {
         if (new_rob.dest >= 0 && new_rob.dest < 32)
           reg.set_dep(new_rob.dest, rob.get_empty()); // set dependence
         rob.add(new_rob);
       }
       if (push_rss) {
+        if (e.first != -1) {
+          if (new_rss.qj == e.first) {
+            new_rss.qj = -1;
+            new_rss.vj = e.second;
+          }
+          if (new_rss.qk == e.first) {
+            new_rss.qk = -1;
+            new_rss.vk = e.second;
+          }
+        }
+        if (f.first != -1) {
+          if (new_rss.qj == f.first) {
+            new_rss.qj = -1;
+            new_rss.vj = f.second;
+          }
+          if (new_rss.qk == f.first) {
+            new_rss.qk = -1;
+            new_rss.vk = f.second;
+          }
+        }
         rss.add(new_rss);
       }
       if (push_lsb) {
+        if (f.first != -1) {
+          if (new_lsb.qj == f.first) {
+            new_lsb.qj = -1;
+            new_lsb.vj = f.second;
+          }
+          if (new_lsb.qk == f.first) {
+            new_lsb.qk = -1;
+            new_lsb.vk = f.second;
+          }
+        }
+        if (e.first != -1) {
+          if (new_lsb.qj == e.first) {
+            new_lsb.qj = -1;
+            new_lsb.vj = e.second;
+          }
+          if (new_lsb.qk == e.first) {
+            new_lsb.qk = -1;
+            new_lsb.vk = e.second;
+          }
+        }
         lsb.add(new_lsb);
       }
 

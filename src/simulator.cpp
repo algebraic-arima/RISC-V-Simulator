@@ -1,5 +1,7 @@
 #include "simulator.h"
 
+//#define vis
+
 namespace arima {
     Simulator::Simulator() {
       init();
@@ -31,25 +33,32 @@ namespace arima {
         }
       } catch (word &res) {
         std::cout << (res & 0xff) << std::endl;
-        std::cout << "Fail rate: " << dec.pred.get_mispredict_rate() << std::endl;
+//        std::cout << "Fail rate: " << dec.pred.get_mispredict_rate() << std::endl;
         return;
       }
     }
 
     void Simulator::flush() {
       mem_bus = new_mem_bus;
+      new_mem_bus.reset();
       cd_bus = new_cd_bus;
+      new_cd_bus.reset();
       dec.flush();
       reg.flush();
-      reg.display();
+
       lsb.flush();
-      lsb.display();
+
       rss.flush();
-      rss.display();
+
       rob.flush();
+#ifdef vis
+      reg.display();
+      lsb.display();
+      rss.display();
       rob.display();
       std::cout << "mem_bus: " << mem_bus << std::endl;
       std::cout << "cd_bus: " << cd_bus << std::endl;
+#endif
     }
 
     void Simulator::execute() {

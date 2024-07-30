@@ -101,7 +101,7 @@ namespace arima {
         new_rob.pop();
       }
       if(new_rob.front().ins.type==S){
-        mem_bus->write(BusType::STen, 0, 0);
+        new_mem_bus->write(BusType::STen, 0, 0);
       }
 
     }

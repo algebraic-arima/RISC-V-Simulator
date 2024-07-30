@@ -17,7 +17,7 @@ namespace arima {
 
     const int RS_SIZE = 4;
 
-    const int ROB_SIZE = 4;
+    const int ROB_SIZE = 8;
 
     const int LSB_SIZE = 4;
 

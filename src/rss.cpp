@@ -31,16 +31,18 @@ namespace arima {
           if (rss[i].qj == e.first) {
             new_rss[i].qj = -1;
             new_rss[i].vj = e.second;
-          } else if (rss[i].qj == f.first) {
-            new_rss[i].qj = -1;
-            new_rss[i].vj = f.second;
           }
-        }
-        if (f.first != -1) {
           if (rss[i].qk == e.first) {
             new_rss[i].qk = -1;
             new_rss[i].vk = e.second;
-          } else if (rss[i].qk == f.first) {
+          }
+        }
+        if (f.first != -1) {
+          if (rss[i].qj == f.first) {
+            new_rss[i].qj = -1;
+            new_rss[i].vj = f.second;
+          }
+          if (rss[i].qk == f.first) {
             new_rss[i].qk = -1;
             new_rss[i].vk = f.second;
           }
@@ -145,8 +147,8 @@ namespace arima {
               new_rss[i].a = (unsigned) new_rss[i].vj >= (unsigned) new_rss[i].vk;
               break;
             case JAL:
-              new_rss[i].a = new_rss[i].ins.imm;
-              break;
+            case LUI:
+            case AUIPC:
             default:
               break;
           }

@@ -147,7 +147,7 @@ namespace arima {
 
       bool full() const {
         return (tail + 1) % size == head;
-      }
+      } // full: size - 1
 
       struct iterator {
         int index;
