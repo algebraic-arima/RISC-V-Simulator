@@ -130,7 +130,6 @@ namespace arima {
             case BEQ:
               new_rss[i].a = new_rss[i].vj == new_rss[i].vk;
               break;
-
             case BNE:
               new_rss[i].a = new_rss[i].vj != new_rss[i].vk;
               break;
@@ -153,8 +152,11 @@ namespace arima {
               break;
           }
 
-          new_cd_bus->write(BusType::Reg, new_rss[i].rob_dest, new_rss[i].a);
-
+          if(en.ins.type!=B)
+            new_cd_bus->write(BusType::Reg, new_rss[i].rob_dest, new_rss[i].a);
+          else{
+            new_cd_bus->write(BusType::PC, new_rss[i].rob_dest, new_rss[i].a);
+          }
           new_rss[i].busy = false;
           break; // complete a calculation in one cycle
 

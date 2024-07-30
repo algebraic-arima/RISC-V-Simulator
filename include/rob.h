@@ -29,8 +29,8 @@ namespace arima {
       bool reset = false, new_reset = false;
     public:
       cir_queue<RobEntry, ROB_SIZE> rob;
-      Bus *cd_bus, *mem_bus;
-      Bus *new_cd_bus, *new_mem_bus;
+      Bus *cd_bus{}, *mem_bus{}, *br_bus{};
+      Bus *new_cd_bus{}, *new_mem_bus{}, *new_br_bus{};
 
       void add(const RobEntry &entry);
 

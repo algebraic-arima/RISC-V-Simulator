@@ -1,5 +1,7 @@
 #include "decoder.h"
 
+#define vis
+
 namespace arima {
 
     bool Predictor::predict() const {
@@ -317,7 +319,8 @@ namespace arima {
           if (r_i != -1) {
             if (rob.get_state(r_i) != Write)
               new_lsb.qj = r_i;
-            else new_lsb.vj = rob.get_value(r_i);
+            else
+              new_lsb.vj = rob.get_value(r_i);
           } else {
             new_lsb.vj = reg[ins.rs1];
           }
@@ -349,7 +352,10 @@ namespace arima {
         }
         r_i = reg.get_dep(ins.rs2);
         if (r_i != -1) {
-          new_lsb.qk = r_i;
+          if (rob.get_state(r_i) != Write)
+            new_lsb.qk = r_i;
+          else
+            new_lsb.vk = rob.get_value(r_i);
         } else {
           new_lsb.vk = reg[ins.rs2];
         }
@@ -359,13 +365,19 @@ namespace arima {
         new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
         int r_i = reg.get_dep(ins.rs1);
         if (r_i != -1) {
-          new_rss.qj = r_i;
+          if (rob.get_state(r_i) != Write)
+            new_rss.qj = r_i;
+          else
+            new_rss.vj = rob.get_value(r_i);
         } else {
           new_rss.vj = reg[ins.rs1];
         }
         r_i = reg.get_dep(ins.rs2);
         if (r_i != -1) {
-          new_rss.qk = r_i;
+          if (rob.get_state(r_i) != Write)
+            new_rss.qk = r_i;
+          else
+            new_rss.vk = rob.get_value(r_i);
         } else {
           new_rss.vk = reg[ins.rs2];
         }

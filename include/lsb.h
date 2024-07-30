@@ -22,6 +22,7 @@ namespace arima {
       cir_queue<LsbEntry, LSB_SIZE> lsb;
       Bus *cd_bus{}, *new_cd_bus{};
       Bus *mem_bus{}, *new_mem_bus{};
+      Bus *br_bus{}, *new_br_bus{};
       bool reset = false, new_reset = false;
       MemoryController mem;
     private:
