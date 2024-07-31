@@ -21,11 +21,6 @@ namespace arima {
 
     void LoadStoreBuffer::execute() {
       if (lsb.empty()) return;
-      if (reset) {
-        new_lsb.clear();
-        new_reset = false;
-        return;
-      }
       if (mem_bus->get_type() == BusType::Reg) {
         auto e = mem_bus->read();
         if (e.first != -1) {

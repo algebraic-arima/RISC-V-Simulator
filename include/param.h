@@ -11,7 +11,7 @@ namespace arima {
     typedef uint16_t hword;
     typedef uint32_t word;
 
-    const int RAM_SIZE = 1 << 18;
+    const int RAM_SIZE = 1 << 19;
 
     const int REG_SIZE = 32;
 

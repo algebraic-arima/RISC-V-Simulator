@@ -36,7 +36,6 @@ namespace arima {
       word instrAddr = 0;
       word new_instrAddr = 0;
       bool freeze = false, new_freeze = false;
-      bool fail = false, new_fail = false;
       Bus *cd_bus{}, *mem_bus{}, *br_bus{};
       Bus *new_cd_bus{}, *new_mem_bus{},*new_br_bus{};
       Predictor pred;

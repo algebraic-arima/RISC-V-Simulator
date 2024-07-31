@@ -136,16 +136,16 @@ namespace arima {
               new_rss[i].a = new_rss[i].vj != new_rss[i].vk;
               break;
             case BLT:
-              new_rss[i].a = new_rss[i].vj < new_rss[i].vk;
+              new_rss[i].a = (int) new_rss[i].vj < (int) new_rss[i].vk;
               break;
             case BGE:
-              new_rss[i].a = new_rss[i].vj >= new_rss[i].vk;
+              new_rss[i].a = (int) new_rss[i].vj >= (int) new_rss[i].vk;
               break;
             case BLTU:
-              new_rss[i].a = (unsigned) new_rss[i].vj < (unsigned) new_rss[i].vk;
+              new_rss[i].a = (word) new_rss[i].vj < (word) new_rss[i].vk;
               break;
             case BGEU:
-              new_rss[i].a = (unsigned) new_rss[i].vj >= (unsigned) new_rss[i].vk;
+              new_rss[i].a = (word) new_rss[i].vj >= (word) new_rss[i].vk;
               break;
             case JAL:
             case LUI:

@@ -1,6 +1,6 @@
 #include "decoder.h"
 
-#define vis
+//#define vis
 
 namespace arima {
 
@@ -388,15 +388,16 @@ namespace arima {
     }
 
     void Decoder::flush() {
-      instrAddr = new_instrAddr;
-      freeze = new_freeze;
       if (br_bus->get_type() == BusType::PC) {
         auto e = br_bus->read();
         if (e.first) {
-          instrAddr = e.second;
+          new_instrAddr = e.second;
+          new_freeze = false;
         }
         pred.update(!e.first);
       }
+      instrAddr = new_instrAddr;
+      freeze = new_freeze;
     }
 
     std::ostream &operator<<(std::ostream &os, const Instruction &ins) {
@@ -427,11 +428,15 @@ namespace arima {
       }
 
       push_rss = false, push_lsb = false, push_rob = false;
-
+      if(instrAddr == 0x115c){
+//        std::cout<<"here"<<std::endl;
+      }
       Instruction ins;
       word instr = fetch(lsb.mem);
       decode(instr, ins);
       parse(ins, reg, rob, lsb, rss);
+      new_rob.addr = instrAddr;
+
 #ifdef vis
       std::cout << ins << std::endl;
 #endif
@@ -489,6 +494,7 @@ namespace arima {
         lsb.add(new_lsb);
       }
       // decoder has to query the mem_bus and cd_bus
+
     }
 
     void Decoder::melt() {

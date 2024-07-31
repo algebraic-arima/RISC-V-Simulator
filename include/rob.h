@@ -21,16 +21,17 @@ namespace arima {
       Instruction ins{};
       word dest = -1;
       int value = 0;
+      word addr = -1;
     };
 
     class ReorderBuffer {
       cir_queue<RobEntry, ROB_SIZE> new_rob;
 
-      bool reset = false, new_reset = false;
     public:
       cir_queue<RobEntry, ROB_SIZE> rob;
       Bus *cd_bus{}, *mem_bus{}, *br_bus{};
       Bus *new_cd_bus{}, *new_mem_bus{}, *new_br_bus{};
+      word *pc{};
 
       void add(const RobEntry &entry);
 

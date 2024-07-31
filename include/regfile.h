@@ -44,6 +44,8 @@ namespace arima {
 
       int get_dep(std::size_t);
 
+      int get_new_dep(std::size_t);
+
       void flush();
 
       void execute() {}

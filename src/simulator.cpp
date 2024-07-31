@@ -1,9 +1,10 @@
 #include "simulator.h"
 
-#define vis
+//#define vis
 
 namespace arima {
-    Simulator::Simulator() {
+    Simulator::Simulator(const char *filename)
+            : lsb(filename) {
       init();
     }
 
@@ -25,6 +26,7 @@ namespace arima {
       rob.new_mem_bus = &new_mem_bus;
       rob.new_br_bus = &new_br_bus;
 
+      rob.pc = &pc;
 
       rss.cd_bus = &cd_bus;
       rss.mem_bus = &mem_bus;
@@ -66,7 +68,11 @@ namespace arima {
       lsb.flush();
       rob.flush();
       rss.flush();
+
+
 #ifdef vis
+      std::cout << "\033[32m" << "PC: " << std::hex << pc << " ";
+      std::cout << "INS: " << dec.instrAddr << std::dec << "\033[0m" << std::endl;
       reg.display();
       lsb.display();
       rss.display();
@@ -75,12 +81,13 @@ namespace arima {
       std::cout << "cd_bus: " << cd_bus << std::endl;
       std::cout << "br_bus: " << br_bus << std::endl;
 #endif
+
     }
 
     void Simulator::execute() {
-      lsb.execute();
+      lsb.execute();rob.execute(dec, reg, lsb);
       rss.execute();
       dec.execute(reg, rob, lsb, rss);
-      rob.execute(dec, reg, lsb);
+
     }
 }

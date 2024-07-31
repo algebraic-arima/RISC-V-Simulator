@@ -23,7 +23,6 @@ namespace arima {
       Bus *cd_bus{}, *new_cd_bus{};
       Bus *mem_bus{}, *new_mem_bus{};
       Bus *br_bus{}, *new_br_bus{};
-      bool reset = false, new_reset = false;
       MemoryController mem;
     private:
       cir_queue<LsbEntry, LSB_SIZE> new_lsb;
@@ -60,7 +59,7 @@ namespace arima {
         }
       }
 
-      LoadStoreBuffer() : mem("../testcases/basicopt1.data") {}
+      explicit LoadStoreBuffer(const char *filename) : mem(filename) {}
 
       bool empty() { return lsb.empty(); }
 

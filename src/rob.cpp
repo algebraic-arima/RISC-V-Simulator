@@ -1,6 +1,5 @@
 #include "rob.h"
 #include "param.h"
-#include "utils.h"
 #include "regfile.h"
 #include "lsb.h"
 #include "decoder.h"
@@ -85,7 +84,7 @@ namespace arima {
             || entry.ins.type == opType::U) {
           int dest = entry.dest;
           reg.set_val(dest, entry.value);
-          if (reg.get_dep(dest) == rob_id) {
+          if (reg.get_new_dep(dest) == rob_id) {
             reg.set_dep(dest, -1);
           }
         } else if (entry.ins.type == opType::S) {
@@ -96,7 +95,7 @@ namespace arima {
           // if succeeded, do nothing
           new_br_bus->write(BusType::PC, entry.value, entry.dest);
           if (entry.value) {
-            std::cout << "h" << std::endl;
+//            std::cout << "h" << std::endl;
           }
         } else if (entry.ins.type == opType::J) {
           if (entry.ins.code == JAL) {
@@ -116,6 +115,7 @@ namespace arima {
 
         }
         new_rob.pop();
+        *pc = entry.addr;
         if (new_rob.front().ins.type == S) {
           new_mem_bus->write(BusType::STen, new_rob.get_front(), 0);
         }

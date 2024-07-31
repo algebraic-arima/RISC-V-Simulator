@@ -24,6 +24,10 @@ namespace arima {
       return reg[idx].dep;
     }
 
+    int RegFile::get_new_dep(std::size_t idx) {
+      return new_reg[idx].dep;
+    }
+
     void RegFile::flush() {
       auto e = br_bus->read();
       if (br_bus->get_type() == BusType::PC && e.first) {

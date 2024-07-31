@@ -13,8 +13,9 @@ namespace arima {
       ReorderBuffer rob;
       Bus cd_bus{}, mem_bus{}, br_bus{};
       Bus new_cd_bus{}, new_mem_bus{}, new_br_bus{};
+      word pc = 0;
 
-      Simulator();
+      explicit Simulator(const char *filename);
 
       void init();
 
