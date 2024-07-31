@@ -59,6 +59,8 @@ namespace arima {
         }
       }
 
+      LoadStoreBuffer() : mem() {}
+
       explicit LoadStoreBuffer(const char *filename) : mem(filename) {}
 
       bool empty() { return lsb.empty(); }

@@ -3,6 +3,10 @@
 //#define vis
 
 namespace arima {
+    Simulator::Simulator():lsb() {
+      init();
+    }
+
     Simulator::Simulator(const char *filename)
             : lsb(filename) {
       init();
