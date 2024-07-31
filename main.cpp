@@ -1,7 +1,7 @@
 #include "simulator.h"
 
 int main() {
-  arima::Simulator sim("../testcases/pi.data");
+  arima::Simulator sim;
   sim.run();
   return 0;
 }
