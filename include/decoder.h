@@ -5,26 +5,9 @@
 #include "lsb.h"
 #include "rob.h"
 #include "rss.h"
+#include "pred.h"
 
 namespace arima {
-
-    struct RobEntry;
-
-    class Predictor {
-      int branch_num = 0;
-      int correct_num = 0;
-      int counter = 2;
-    public:
-      Predictor() = default;
-
-      word next_front(word front, word offset) const;
-
-      bool predict() const;
-
-      void update(bool);
-
-      int get_mispredict_rate() const;
-    };
 
     class Decoder {
       bool push_rss = false, push_rob = false, push_lsb = false;

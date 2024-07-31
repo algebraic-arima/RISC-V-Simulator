@@ -4,33 +4,6 @@
 
 namespace arima {
 
-    bool Predictor::predict() const {
-      return counter >= 2; // jump or not
-    }
-
-    word Predictor::next_front(word front, word imm) const {
-      return (predict()) ? imm : front + 4;
-    }
-
-    void Predictor::update(bool correct) {
-      if (correct) {
-        if (counter < 3) {
-          counter++;
-        }
-        correct_num++;
-      } else {
-        if (counter > 0) {
-          counter--;
-        }
-      }
-      branch_num++;
-    }
-
-    int Predictor::get_mispredict_rate() const {
-//      return (branch_num - correct_num) * 100 / branch_num;
-      return 0;
-    }
-
     word Decoder::fetch(MemoryController &mem) {
       return mem.ldw(instrAddr);
     }

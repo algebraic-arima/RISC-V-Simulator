@@ -17,7 +17,6 @@ add_executable(code
         include/utils.h
         src/regfile.cpp
         include/regfile.h
-        include/alu.h
         include/rss.h
         include/rob.h
         src/rob.cpp
@@ -26,4 +25,6 @@ add_executable(code
         src/simulator.cpp
         include/simulator.h
         main.cpp
-        include/utils.cpp)
+        include/utils.cpp
+        include/pred.h
+        src/pred.cpp)

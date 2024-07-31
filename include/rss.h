@@ -2,7 +2,6 @@
 #define RISCV_RSS_H
 
 #include "utils.h"
-#include "alu.h"
 #include "bus.h"
 
 namespace arima {
@@ -21,7 +20,6 @@ namespace arima {
     class ReservationStation {
     public:
       arr<RssEntry, RS_SIZE> rss;
-      ALU alu;
       Bus *cd_bus{}, *mem_bus{}, *br_bus{};
       Bus *new_cd_bus{}, *new_mem_bus{}, *new_br_bus{};
     private:
