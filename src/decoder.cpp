@@ -428,9 +428,6 @@ namespace arima {
       }
 
       push_rss = false, push_lsb = false, push_rob = false;
-      if(instrAddr == 0x115c){
-//        std::cout<<"here"<<std::endl;
-      }
       Instruction ins;
       word instr = fetch(lsb.mem);
       decode(instr, ins);

@@ -586,7 +586,7 @@ public:
       }
       state.pc += 4;
 #ifdef vis
-      std::ofstream of("../log/gcd.log", std::ios::app);
+      std::ofstream of("../log/magic.log", std::ios::app);
       display(of);
 #endif
     }
@@ -595,7 +595,7 @@ public:
 };
 
 int main() {
-  Simulator s("F:/vscode/RISC-V-Simulator/testcases/gcd.data");
+  Simulator s("F:/vscode/RISC-V-Simulator/testcases/magic.data");
   s.run();
   return 0;
 }

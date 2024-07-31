@@ -7,7 +7,7 @@
 namespace arima {
     void ReorderBuffer::add(const RobEntry &entry) {
       if (new_rob.empty() && entry.ins.type == S) {
-        new_mem_bus->write(BusType::STen, 0, 0);
+        new_mem_bus->write(BusType::STen, get_empty(), 0);
       }
       new_rob.push(entry);
     }

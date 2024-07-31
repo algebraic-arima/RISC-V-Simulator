@@ -1,8 +1,7 @@
 #include "simulator.h"
 
-//"../testcases/superloop.data"
 int main() {
-  arima::Simulator sim;
+  arima::Simulator sim("../testcases/pi.data");
   sim.run();
   return 0;
 }

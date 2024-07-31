@@ -3,7 +3,7 @@
 //#define vis
 
 namespace arima {
-    Simulator::Simulator():lsb() {
+    Simulator::Simulator() : lsb() {
       init();
     }
 
@@ -73,8 +73,19 @@ namespace arima {
       rob.flush();
       rss.flush();
 
-
 #ifdef vis
+
+      if (pc == 0x1144 || pc == 0x113c || pc == 0x1140) {
+        std::cout << "start" << std::endl;
+        reg.display();
+        lsb.display();
+        rss.display();
+        rob.display();
+        std::cout << "mem_bus: " << mem_bus << std::endl;
+        std::cout << "cd_bus: " << cd_bus << std::endl;
+        std::cout << "br_bus: " << br_bus << std::endl;
+      }
+
       std::cout << "\033[32m" << "PC: " << std::hex << pc << " ";
       std::cout << "INS: " << dec.instrAddr << std::dec << "\033[0m" << std::endl;
       reg.display();
@@ -89,9 +100,9 @@ namespace arima {
     }
 
     void Simulator::execute() {
-      lsb.execute();rob.execute(dec, reg, lsb);
+      lsb.execute();
       rss.execute();
       dec.execute(reg, rob, lsb, rss);
-
+      rob.execute(dec, reg, lsb);
     }
 }
