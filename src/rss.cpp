@@ -34,6 +34,7 @@ namespace arima {
       auto e = cd_bus->read();
       auto f = mem_bus->read();
       for (int i = 0; i < RS_SIZE; i++) {
+        if (!rss[i].busy) continue;
         if (e.first != -1) {
           if (rss[i].qj == e.first) {
             new_rss[i].qj = -1;
@@ -57,14 +58,7 @@ namespace arima {
       }
     }
 
-    void ReservationStation::clear() {
-      for (auto &entry: new_rss) {
-        entry.busy = false;
-      }
-    }
-
-    void ReservationStation::execute() {
-      update();
+    void ReservationStation::calc() {
       for (int i = 0; i < RS_SIZE; i++) {
         if (rss[i].busy && rss[i].qj == -1 && rss[i].qk == -1) {
           auto en = new_rss[i];
@@ -161,10 +155,14 @@ namespace arima {
             new_cd_bus->write(BusType::PC, new_rss[i].rob_dest, new_rss[i].a);
           }
           new_rss[i].busy = false;
-          break; // complete a calculation in one cycle
-
+          break;
+          // complete one calculation in one cycle
         }
       }
+    }
 
+    void ReservationStation::execute() {
+      update();
+      calc();
     }
 }

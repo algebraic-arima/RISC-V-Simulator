@@ -4,7 +4,7 @@
 
 namespace arima {
 
-    word Decoder::fetch(MemoryController &mem) {
+    word Decoder::fetch(MemoryController &mem) const {
       return mem.ldw(instrAddr);
     }
 
@@ -464,13 +464,7 @@ namespace arima {
         lsb.add(new_lsb);
       }
       // decoder has to query the mem_bus and cd_bus
-
     }
-
-    void Decoder::melt() {
-      freeze = false;
-    }
-
 
 }
 

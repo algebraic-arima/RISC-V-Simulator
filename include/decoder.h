@@ -25,7 +25,7 @@ namespace arima {
 
       void decode(word, Instruction &);
 
-      word fetch(MemoryController &mem);
+      word fetch(MemoryController &mem) const;
 
       void parse(const Instruction &ins,
                  RegFile &reg,
@@ -40,7 +40,6 @@ namespace arima {
 
       void flush();
 
-      void melt();
     };
 
 }

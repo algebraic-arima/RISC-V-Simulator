@@ -25,6 +25,6 @@ add_executable(code
         src/simulator.cpp
         include/simulator.h
         main.cpp
-        include/utils.cpp
+        src/utils.cpp
         include/pred.h
         src/pred.cpp)

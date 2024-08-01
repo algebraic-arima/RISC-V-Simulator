@@ -62,7 +62,7 @@ namespace arima {
 
       void flush();
 
-      void clear();
+      void calc();
 
       void execute();
     };
