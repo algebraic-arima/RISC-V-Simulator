@@ -77,7 +77,7 @@ namespace arima {
         }
       } catch (word &res) {
         std::cout << (res & 0xff) << std::endl;
-        std::cout << "Success rate: " << dec.pred.get_succ_rate() << std::endl;
+//        std::cout << "Success rate: " << dec.pred.get_succ_rate() << std::endl;
         return;
       }
     }
