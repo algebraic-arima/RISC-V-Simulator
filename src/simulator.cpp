@@ -5,6 +5,7 @@
 
 //#define vis
 //#define log
+//#define br_his
 
 namespace arima {
     Simulator::Simulator() : lsb() {
@@ -42,6 +43,9 @@ namespace arima {
       dec.new_mem_bus = &new_mem_bus;
       dec.new_br_bus = &new_br_bus;
 
+      dec.br_pc = &br_pc;
+      dec.new_br_pc = &new_br_pc;
+
       rob.cd_bus = &cd_bus;
       rob.mem_bus = &mem_bus;
       rob.br_bus = &br_bus;
@@ -50,6 +54,9 @@ namespace arima {
       rob.new_br_bus = &new_br_bus;
 
       rob.pc = &pc;
+
+      rob.br_pc = &br_pc;
+      rob.new_br_pc = &new_br_pc;
 
       rss.cd_bus = &cd_bus;
       rss.mem_bus = &mem_bus;
@@ -70,14 +77,19 @@ namespace arima {
       try {
         while (true) {
           flush();
-//          if (pc == 0x1348 && dec.instrAddr == 0x1358) {
+//          if (pc == 524424 || (pc == 0x1054 && dec.instr_addr == 0x108c)) {
 //            std::cout << "やっとついた" << std::endl;
 //          }
           execute();
         }
       } catch (word &res) {
         std::cout << (res & 0xff) << std::endl;
-        std::cout << "Success rate: " << dec.pred.get_succ_rate() << std::endl;
+//        std::cout << "Success rate: " << dec.pred.get_succ_rate() << std::endl;
+#ifdef br_his
+        for (int i = 0; i < 2048; ++i)
+          if (!dec.pred.histoire[i].empty())
+            std::cout << i << ": " << dec.pred.histoire[i] << std::endl;
+#endif
         return;
       }
     }
@@ -89,6 +101,8 @@ namespace arima {
       new_cd_bus.reset();
       br_bus = new_br_bus;
       new_br_bus.reset();
+      br_pc = new_br_pc;
+      new_br_pc = -1;
 
       std::shuffle(std::begin(flushFuncs), std::end(flushFuncs), std::default_random_engine(seed));
 
@@ -108,7 +122,7 @@ namespace arima {
         std::cout << "br_bus: " << br_bus << std::endl;
       }
       std::cout << "\033[32m" << "PC: " << std::hex << pc << " ";
-      std::cout << "INS: " << dec.instrAddr << std::dec << "\033[0m" << std::endl;
+      std::cout << "INS: " << dec.instr_addr << std::dec << "\033[0m" << std::endl;
       reg.display();
       lsb.display();
       rss.display();
@@ -118,7 +132,7 @@ namespace arima {
       std::cout << "br_bus: " << br_bus << std::endl;
 #endif
 //      std::cout << "PC: " << std::hex << pc << " ";
-//      std::cout << "INS: " << dec.instrAddr << std::dec << std::endl;
+//      std::cout << "INS: " << dec.instr_addr << std::dec << std::endl;
 
     }
 

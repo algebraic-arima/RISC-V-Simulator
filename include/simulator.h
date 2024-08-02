@@ -14,6 +14,7 @@ namespace arima {
       ReorderBuffer rob;
       Bus cd_bus{}, mem_bus{}, br_bus{};
       Bus new_cd_bus{}, new_mem_bus{}, new_br_bus{};
+      word br_pc = 0, new_br_pc = 0;
       word pc = 0;
       unsigned seed = 0;
 

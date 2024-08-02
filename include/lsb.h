@@ -19,16 +19,15 @@ namespace arima {
 
     class LoadStoreBuffer {
     public:
-      cir_queue<LsbEntry, LSB_SIZE> lsb;
       Bus *cd_bus{}, *new_cd_bus{};
       Bus *mem_bus{}, *new_mem_bus{};
       Bus *br_bus{}, *new_br_bus{};
       MemoryController mem;
     private:
-      cir_queue<LsbEntry, LSB_SIZE> new_lsb;
+      cir_queue<std::pair<LsbEntry,bool>, LSB_SIZE> lsb;
+      cir_queue<std::pair<LsbEntry,bool>, LSB_SIZE> new_lsb;
 
     public:
-
 
       void display() {
         if (lsb.empty()) {
@@ -47,7 +46,8 @@ namespace arima {
                   << std::setw(10) << "ROB Dest" << std::endl;
 
         // Print table rows
-        for (auto &e: lsb) {
+        for (auto &f: lsb) {
+          auto e = f.first;
           std::cout << std::left << std::setw(10) << e.ready
                     << std::setw(10) << opCodeStr[e.code]
                     << std::setw(10) << e.vj
@@ -65,11 +65,9 @@ namespace arima {
 
       bool empty() { return lsb.empty(); }
 
-      bool full() { return lsb.full(); }
+      bool full() const { return lsb.full(); }
 
       void add(const LsbEntry &entry);
-
-      void set_ready();
 
       void flush();
 

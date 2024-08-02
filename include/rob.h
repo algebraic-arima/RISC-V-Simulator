@@ -31,6 +31,7 @@ namespace arima {
       cir_queue<RobEntry, ROB_SIZE> rob;
       Bus *cd_bus{}, *mem_bus{}, *br_bus{};
       Bus *new_cd_bus{}, *new_mem_bus{}, *new_br_bus{};
+      word *br_pc{}, *new_br_pc{};
       word *pc{};
 
       void add(const RobEntry &entry);

@@ -2,11 +2,7 @@
 
 namespace arima {
     void LoadStoreBuffer::add(const LsbEntry &entry) {
-      new_lsb.push(entry);
-    }
-
-    void LoadStoreBuffer::set_ready() {
-      new_lsb.front().ready = true;
+      new_lsb.push(std::pair(entry, false));
     }
 
     void LoadStoreBuffer::flush() {
@@ -26,7 +22,8 @@ namespace arima {
         if (e.first != -1) {
           int reg = e.first;
           word val = e.second;
-          for (auto &entry: new_lsb) {
+          for (auto &e: new_lsb) {
+            auto &entry = e.first;
             if (entry.qj == reg) {
               entry.vj = val;
               entry.qj = -1;
@@ -38,9 +35,11 @@ namespace arima {
           }
         }
       } else if (mem_bus->get_type() == BusType::STen) {
-        if (lsb.front().code == SB || lsb.front().code == SH || lsb.front().code == SW) {
-          if (mem_bus->read().first == lsb.front().rob_dest) {
-            new_lsb.front().ready = true;
+        if (lsb.front().first.code == SB
+            || lsb.front().first.code == SH
+            || lsb.front().first.code == SW) {
+          if (mem_bus->read().first == lsb.front().first.rob_dest) {
+            new_lsb.front().first.ready = true;
           }
         }
       }
@@ -50,7 +49,8 @@ namespace arima {
         if (e.first != -1) {
           int reg = e.first;
           word val = e.second;
-          for (auto &entry: new_lsb) {
+          for (auto &e: new_lsb) {
+            auto &entry = e.first;
             if (entry.qj == reg) {
               entry.vj = val;
               entry.qj = -1;
@@ -63,11 +63,19 @@ namespace arima {
         }
       }
 
-      LsbEntry entry = lsb.front();
+      LsbEntry entry = lsb.front().first;
+      bool &state = lsb.front().second;
+      bool &new_state = new_lsb.front().second;
       word result;
       if (!entry.ready || entry.qj != -1 || entry.qk != -1) {
         return;
       } else {
+        if (!state) {
+          new_state = true;
+          return;
+        }
+        // for the first time, just set state to true and do nothing
+        // in order to simulate the I/O delay of memory
         entry.a += entry.vj;
         switch (entry.code) {
           case LB:

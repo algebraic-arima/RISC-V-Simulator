@@ -5,7 +5,7 @@
 namespace arima {
 
     word Decoder::fetch(MemoryController &mem) const {
-      return mem.ldw(instrAddr);
+      return mem.ldw(instr_addr);
     }
 
     void decode_branch(word input, Instruction &ins) {
@@ -230,21 +230,21 @@ namespace arima {
 
       if (ins.code == AUIPC) {
         push_rob = push_rss = true;
-        new_rob = {Issue, ins, ins.rd, static_cast<int>((instrAddr + ins.imm))};
-        new_rss = {true, ins, 0, 0, -1, -1, static_cast<int>(instrAddr + ins.imm), rob.get_empty()};
+        new_rob = {Issue, ins, ins.rd, static_cast<int>((instr_addr + ins.imm))};
+        new_rss = {true, ins, 0, 0, -1, -1, static_cast<int>(instr_addr + ins.imm), rob.get_empty()};
       } else if (ins.code == opCode::LUI) {
         push_rob = push_rss = true;
         new_rob = {Issue, ins, ins.rd, ins.imm};
         new_rss = {true, ins, 0, 0, -1, -1, ins.imm, rob.get_empty()};
       } else if (ins.code == JAL) {
         push_rob = push_rss = true;
-        new_rob = {Issue, ins, ins.rd, static_cast<int>(instrAddr + 4)};
-        new_rss = {true, ins, 0, 0, -1, -1, static_cast<int>(instrAddr + 4), rob.get_empty()};
-        new_instrAddr = instrAddr + ins.imm;
+        new_rob = {Issue, ins, ins.rd, static_cast<int>(instr_addr + 4)};
+        new_rss = {true, ins, 0, 0, -1, -1, static_cast<int>(instr_addr + 4), rob.get_empty()};
+        new_instr_addr = instr_addr + ins.imm;
         return;
       } else if (ins.code == JALR) {
         push_rss = push_rob = true;
-        new_rob = {Issue, ins, ins.rd, static_cast<int>(instrAddr + 4)};
+        new_rob = {Issue, ins, ins.rd, static_cast<int>(instr_addr + 4)};
         new_rss = {true, ins, 0, ins.imm, -1, -1, 0, rob.get_empty()};
         int r_i = reg.get_dep(ins.rs1);
         if (r_i != -1) {
@@ -350,26 +350,31 @@ namespace arima {
         } else {
           new_rss.vk = reg[ins.rs2];
         }
-        new_instrAddr = pred.next_front(instrAddr, instrAddr + ins.imm);
-        new_rob.value = pred.predict(); // 1 for jump, 0 for not
-        if (new_rob.value) new_rob.dest = instrAddr + 4;
-        else new_rob.dest = instrAddr + ins.imm;
+        new_instr_addr = pred.next_front(instr_addr, instr_addr + ins.imm);
+        new_rob.value = pred.predict(instr_addr); // 1 for jump, 0 for not
+        if (new_rob.value) new_rob.dest = instr_addr + 4;
+        else new_rob.dest = instr_addr + ins.imm;
         // dest is the PC after a prediction fail
         return;
       }
-      new_instrAddr = instrAddr + 4;
+      new_instr_addr = instr_addr + 4;
     }
 
     void Decoder::flush() {
       if (br_bus->get_type() == BusType::PC) {
         auto e = br_bus->read();
+        auto f = *br_pc;
         if (e.first) {
-          new_instrAddr = e.second;
+          new_instr_addr = e.second;
           new_freeze = false;
         }
-        pred.update(!e.first);
+        if (new_instr_addr == f + 4) {
+          pred.update(f, false, !e.first);
+        } else {
+          pred.update(f, true, !e.first);
+        }
       }
-      instrAddr = new_instrAddr;
+      instr_addr = new_instr_addr;
       freeze = new_freeze;
     }
 
@@ -390,7 +395,7 @@ namespace arima {
       for (auto &e: rob.rob) {
         if (e.ins.code == JALR) {
           new_freeze = true;
-          new_instrAddr = e.value;
+          new_instr_addr = e.value;
         }
       }
       if (freeze) {
@@ -405,7 +410,7 @@ namespace arima {
       word instr = fetch(lsb.mem);
       decode(instr, ins);
       parse(ins, reg, rob, lsb, rss);
-      new_rob.addr = instrAddr;
+      new_rob.addr = instr_addr;
 
 #ifdef vis
       std::cout << ins << std::endl;

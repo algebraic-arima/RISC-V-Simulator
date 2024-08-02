@@ -16,11 +16,12 @@ namespace arima {
       LsbEntry new_lsb;
 
     public:
-      word instrAddr = 0;
-      word new_instrAddr = 0;
+      word instr_addr = 0;
+      word new_instr_addr = 0;
       bool freeze = false, new_freeze = false;
       Bus *cd_bus{}, *mem_bus{}, *br_bus{};
-      Bus *new_cd_bus{}, *new_mem_bus{},*new_br_bus{};
+      Bus *new_cd_bus{}, *new_mem_bus{}, *new_br_bus{};
+      word *br_pc{}, *new_br_pc{};
       Predictor pred;
 
       void decode(word, Instruction &);

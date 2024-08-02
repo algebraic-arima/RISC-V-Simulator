@@ -5,6 +5,7 @@
 #include "decoder.h"
 
 namespace arima {
+
     void ReorderBuffer::add(const RobEntry &entry) {
       if (new_rob.empty() && entry.ins.type == S) {
         new_mem_bus->write(BusType::STen, get_empty(), 0);
@@ -91,9 +92,10 @@ namespace arima {
           // nothing
         } else if (entry.ins.type == opType::B) {
           // type, predict succeed/fail, next PC offset
-          // if predict failed, reset instrAddr to next PC
+          // if predict failed, reset instr_addr to next PC
           // if succeeded, do nothing
           new_br_bus->write(BusType::PC, entry.value, entry.dest);
+          *new_br_pc = entry.addr;
           if (entry.value) {
 //            std::cout << "h" << std::endl;
           }
