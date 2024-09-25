@@ -147,7 +147,12 @@ namespace arima {
             default:
               break;
           }
-
+          new_rss[i].ready = true;
+        }
+      }
+      for (int i = 0; i < RS_SIZE; i++) {
+        if (rss[i].busy && rss[i].ready) {
+          auto en = new_rss[i];
           if (en.ins.type != B)
             new_cd_bus->write(BusType::Reg, new_rss[i].rob_dest, new_rss[i].a);
           else {

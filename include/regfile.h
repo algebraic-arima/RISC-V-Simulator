@@ -12,7 +12,6 @@ namespace arima {
     };
 
     class RegFile {
-      Register new_reg[REG_SIZE];
     public:
       Register reg[REG_SIZE];
       Bus *br_bus{}, *new_br_bus{};
@@ -49,6 +48,8 @@ namespace arima {
       void flush();
 
       void execute() {}
+
+      Register new_reg[REG_SIZE];
     };
 }
 

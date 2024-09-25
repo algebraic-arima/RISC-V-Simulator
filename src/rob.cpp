@@ -103,13 +103,13 @@ namespace arima {
           if (entry.ins.code == JAL) {
             int dest = entry.dest;
             reg.set_val(dest, entry.value);
-            if (reg.get_dep(dest) == rob_id) {
+            if (reg.get_new_dep(dest) == rob_id) {
               reg.set_dep(dest, -1);
             }
           } else if (entry.ins.code == JALR) {
             int dest = entry.dest;
             reg.set_val(dest, entry.value);
-            if (reg.get_dep(dest) == rob_id) {
+            if (reg.get_new_dep(dest) == rob_id) {
               reg.set_dep(dest, -1);
             }
 

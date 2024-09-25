@@ -119,6 +119,5 @@ namespace arima {
         }
         new_lsb.pop();
       }
-
     }
 }

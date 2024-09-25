@@ -15,6 +15,7 @@ namespace arima {
       int qj = -1, qk = -1;
       int a = 0;
       int rob_dest = -1;
+      bool ready = false;
     };
 
     class ReservationStation {
